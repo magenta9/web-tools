@@ -6,42 +6,44 @@
 
 :root {
   /* Cyberpunk Theme - Light Mode */
-  --bg-primary: #0a0a0a;
-  --bg-secondary: #1a1a1a;
-  --bg-tertiary: #2a2a2a;
-  --text-primary: #e0e0e0;
-  --text-secondary: #a0a0a0;
-  --text-muted: #666666;
-  --accent-color: #00ffff;
-  --accent-secondary: #ff00ff;
-  --accent-tertiary: #00ff88;
-  --accent-hover: #00cccc;
-  --code-bg: #0f0f0f;
-  --card-bg: #1a1a1a;
-  --border-color: #333333;
-  --neon-glow: 0 0 20px rgba(0, 255, 255, 0.5);
-  --neon-glow-pink: 0 0 20px rgba(255, 0, 255, 0.5);
-  --neon-glow-green: 0 0 20px rgba(0, 255, 136, 0.5);
+  --bg-primary: #f0f4f8;
+  --bg-secondary: #e2e8f0;
+  --bg-tertiary: #cbd5e1;
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --text-muted: #64748b;
+  --accent-color: #0891b2;
+  --accent-secondary: #c026d3;
+  --accent-tertiary: #059669;
+  --accent-hover: #0e7490;
+  --code-bg: #e2e8f0;
+  --card-bg: #ffffff;
+  --border-color: #94a3b8;
+  --neon-glow: 0 0 15px rgba(8, 145, 178, 0.4);
+  --neon-glow-pink: 0 0 15px rgba(192, 38, 211, 0.4);
+  --neon-glow-green: 0 0 15px rgba(5, 150, 105, 0.4);
+  --grid-color: rgba(8, 145, 178, 0.15);
 }
 
 .dark {
   /* Enhanced Dark Mode */
-  --bg-primary: #000000;
-  --bg-secondary: #0a0a0a;
-  --bg-tertiary: #1a1a1a;
-  --text-primary: #ffffff;
-  --text-secondary: #cccccc;
-  --text-muted: #888888;
-  --border-color: #2a2a2a;
-  --accent-color: #00ffff;
-  --accent-secondary: #ff00ff;
-  --accent-tertiary: #00ff88;
-  --accent-hover: #00cccc;
-  --code-bg: #050505;
-  --card-bg: #0a0a0a;
-  --neon-glow: 0 0 30px rgba(0, 255, 255, 0.7);
-  --neon-glow-pink: 0 0 30px rgba(255, 0, 255, 0.7);
-  --neon-glow-green: 0 0 30px rgba(0, 255, 136, 0.7);
+  --bg-primary: #030712;
+  --bg-secondary: #111827;
+  --bg-tertiary: #1f2937;
+  --text-primary: #f9fafb;
+  --text-secondary: #d1d5db;
+  --text-muted: #9ca3af;
+  --border-color: #374151;
+  --accent-color: #22d3ee;
+  --accent-secondary: #e879f9;
+  --accent-tertiary: #34d399;
+  --accent-hover: #06b6d4;
+  --code-bg: #0f172a;
+  --card-bg: #111827;
+  --neon-glow: 0 0 25px rgba(34, 211, 238, 0.6);
+  --neon-glow-pink: 0 0 25px rgba(232, 121, 249, 0.6);
+  --neon-glow-green: 0 0 25px rgba(52, 211, 153, 0.6);
+  --grid-color: rgba(34, 211, 238, 0.1);
 }
 
 * {
@@ -52,8 +54,13 @@
 
 /* Animated background */
 @keyframes grid-move {
-  0% { transform: translate(0, 0); }
-  100% { transform: translate(30px, 30px); }
+  0% {
+    transform: translate(0, 0);
+  }
+
+  100% {
+    transform: translate(30px, 30px);
+  }
 }
 
 html,
@@ -75,8 +82,8 @@ body::before {
   width: 100%;
   height: 100%;
   background-image:
-    linear-gradient(rgba(0, 255, 255, 0.1) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px);
+    linear-gradient(var(--grid-color) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
   background-size: 50px 50px;
   animation: grid-move 10s linear infinite;
   pointer-events: none;
@@ -148,7 +155,9 @@ a:hover {
   text-shadow: 0 0 10px currentColor;
 }
 
-input, textarea, select {
+input,
+textarea,
+select {
   background-color: var(--bg-secondary);
   color: var(--text-primary);
   border: 2px solid transparent;
@@ -161,7 +170,9 @@ input, textarea, select {
   position: relative;
 }
 
-input:focus, textarea:focus, select:focus {
+input:focus,
+textarea:focus,
+select:focus {
   outline: none;
   border-color: var(--accent-color);
   box-shadow: var(--neon-glow);
@@ -243,8 +254,13 @@ input:focus, textarea:focus, select:focus {
 }
 
 @keyframes scanline {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(100%);
+  }
 }
 
 .logo {
@@ -268,7 +284,9 @@ input:focus, textarea:focus, select:focus {
 }
 
 @keyframes rotate {
-  100% { transform: translateY(-50%) rotate(360deg); }
+  100% {
+    transform: translateY(-50%) rotate(360deg);
+  }
 }
 
 .logo-icon {
@@ -279,8 +297,15 @@ input:focus, textarea:focus, select:focus {
 }
 
 @keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.1); }
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.1);
+  }
 }
 
 .logo-text {
@@ -304,8 +329,15 @@ input:focus, textarea:focus, select:focus {
 }
 
 @keyframes gradient-shift {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
 }
 
 .logo-subtitle {
@@ -323,9 +355,9 @@ input:focus, textarea:focus, select:focus {
   align-items: center;
   gap: 0;
   flex-wrap: wrap;
-  background: rgba(0, 255, 255, 0.05);
+  background: var(--bg-secondary);
   padding: 4px;
-  border: 1px solid rgba(0, 255, 255, 0.3);
+  border: 1px solid var(--border-color);
   clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
 }
 
@@ -355,7 +387,8 @@ input:focus, textarea:focus, select:focus {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.3), transparent);
+  background: linear-gradient(90deg, transparent, var(--accent-color), transparent);
+  opacity: 0.3;
   transition: left 0.5s;
 }
 
@@ -366,26 +399,26 @@ input:focus, textarea:focus, select:focus {
 .nav-link:hover {
   color: var(--accent-color);
   text-shadow: 0 0 10px var(--accent-color);
-  background: rgba(0, 255, 255, 0.1);
+  background: var(--bg-tertiary);
 }
 
 .nav-link.active {
-  color: var(--bg-primary);
+  color: var(--card-bg);
   background: linear-gradient(135deg, var(--accent-color), var(--accent-secondary));
-  text-shadow: 0 0 15px rgba(0, 255, 255, 0.8);
-  box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+  text-shadow: none;
+  box-shadow: var(--neon-glow);
 }
 
 .theme-toggle {
-  background: rgba(255, 0, 255, 0.1);
+  background: var(--bg-tertiary);
   border: 1px solid var(--accent-secondary);
   color: var(--accent-secondary);
 }
 
 .theme-toggle:hover {
-  background: rgba(255, 0, 255, 0.2);
+  background: var(--accent-secondary);
   box-shadow: var(--neon-glow-pink);
-  color: var(--text-primary);
+  color: var(--card-bg);
 }
 
 /* Hero Section */
@@ -428,10 +461,23 @@ input:focus, textarea:focus, select:focus {
 }
 
 @keyframes gradient-flow {
-  0%, 100% { background-position: 0% 50%; }
-  25% { background-position: 100% 0%; }
-  50% { background-position: 100% 100%; }
-  75% { background-position: 0% 100%; }
+
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+
+  25% {
+    background-position: 100% 0%;
+  }
+
+  50% {
+    background-position: 100% 100%;
+  }
+
+  75% {
+    background-position: 0% 100%;
+  }
 }
 
 .hero p {
@@ -510,15 +556,14 @@ input:focus, textarea:focus, select:focus {
   transform: translate(-50%, -50%);
   width: 0;
   height: 0;
-  background: radial-gradient(circle, rgba(0, 255, 255, 0.3), transparent);
+  background: radial-gradient(circle, var(--accent-color), transparent);
+  opacity: 0.2;
   transition: all 0.4s ease;
 }
 
 .tool-card:hover {
   transform: translateY(-10px) scale(1.02);
-  box-shadow:
-    0 20px 40px rgba(0, 255, 255, 0.3),
-    0 0 60px rgba(0, 255, 255, 0.1);
+  box-shadow: var(--neon-glow);
   border-image: linear-gradient(135deg, var(--accent-color), var(--accent-secondary)) 1;
 }
 
@@ -560,8 +605,15 @@ input:focus, textarea:focus, select:focus {
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 .tool-card h3 {
@@ -611,7 +663,7 @@ input:focus, textarea:focus, select:focus {
 
 .card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 10px 30px rgba(0, 255, 255, 0.2);
+  box-shadow: var(--neon-glow);
 }
 
 .btn {
@@ -668,7 +720,7 @@ input:focus, textarea:focus, select:focus {
 .btn-secondary:hover {
   color: var(--accent-color);
   text-shadow: 0 0 10px var(--accent-color);
-  background: rgba(0, 255, 255, 0.05);
+  background: var(--bg-tertiary);
 }
 
 .btn-icon {
@@ -680,20 +732,37 @@ input:focus, textarea:focus, select:focus {
 }
 
 .btn-icon:hover {
-  background: rgba(0, 255, 255, 0.05);
+  background: var(--bg-tertiary);
   color: var(--accent-color);
   border-color: var(--accent-color);
-  box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+  box-shadow: var(--neon-glow);
 }
 
 /* Glitch effect */
 @keyframes glitch {
-  0% { transform: translate(0); }
-  20% { transform: translate(-2px, 2px); }
-  40% { transform: translate(-2px, -2px); }
-  60% { transform: translate(2px, 2px); }
-  80% { transform: translate(2px, -2px); }
-  100% { transform: translate(0); }
+  0% {
+    transform: translate(0);
+  }
+
+  20% {
+    transform: translate(-2px, 2px);
+  }
+
+  40% {
+    transform: translate(-2px, -2px);
+  }
+
+  60% {
+    transform: translate(2px, 2px);
+  }
+
+  80% {
+    transform: translate(2px, -2px);
+  }
+
+  100% {
+    transform: translate(0);
+  }
 }
 
 .glitch {
@@ -744,9 +813,17 @@ input:focus, textarea:focus, select:focus {
 
 /* Loading animation */
 @keyframes cyber-load {
-  0% { width: 0; }
-  50% { width: 100%; }
-  100% { width: 0; }
+  0% {
+    width: 0;
+  }
+
+  50% {
+    width: 100%;
+  }
+
+  100% {
+    width: 0;
+  }
 }
 
 .loading-bar {
@@ -766,6 +843,13 @@ input:focus, textarea:focus, select:focus {
 }
 
 @keyframes text-flow {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
 }

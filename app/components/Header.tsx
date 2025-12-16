@@ -59,7 +59,7 @@ export default function Header() {
           >
             <FontAwesomeIcon icon={isDarkMode ? faSun : faMoon} />
             <span style={{ marginLeft: '5px' }}>
-              {isDarkMode ? 'DARK' : 'LIGHT'}
+              {isDarkMode ? 'LIGHT' : 'DARK'}
             </span>
           </button>
         </nav>
