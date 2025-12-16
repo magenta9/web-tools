@@ -1,46 +1,70 @@
-# Getting Started with Create React App
+# Web Tools
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A collection of useful web tools built with Next.js and TypeScript.
 
-## Available Scripts
+## Features
 
-In the project directory, you can run:
+- **JWT Tool**: Encode and decode JSON Web Tokens
+- **JSON Tool**: Format, validate, and manipulate JSON data
+- **Image Tool**: Convert and resize images
+- **Timestamp Tool**: Convert timestamps between different formats
+- **Diff Tool**: Compare text and find differences
 
-### `npm start`
+## Tech Stack
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+- Next.js 15
+- React 19
+- TypeScript
+- Tailwind CSS
+- Font Awesome Icons
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## Getting Started
 
-### `npm test`
+First, install the dependencies:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```bash
+npm install
+# or
+yarn install
+# or
+bun install
+```
 
-### `npm run build`
+Then, run the development server:
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```bash
+npm run dev
+# or
+yarn dev
+# or
+bun dev
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Build for Production
 
-### `npm run eject`
+To build the project for production:
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+```bash
+npm run build
+# or
+yarn build
+# or
+bun build
+```
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+The static files will be generated in the `out` directory, ready for deployment.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+## Deployment
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+This project is configured for static export and can be deployed to:
 
-## Learn More
+- GitHub Pages
+- Netlify
+- Vercel
+- Any static hosting service
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## License
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+MIT License
