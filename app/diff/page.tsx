@@ -18,10 +18,17 @@ import {
 import Layout from '../components/Layout'
 import '../tools.css'
 
+interface DiffLine {
+  type: 'added' | 'removed' | 'modified' | 'unchanged'
+  key: string
+  oldValue?: string
+  newValue?: string
+}
+
 export default function JsonDiff() {
   const [oldJson, setOldJson] = useState('')
   const [newJson, setNewJson] = useState('')
-  const [diffOutput, setDiffOutput] = useState('')
+  const [diffOutput, setDiffOutput] = useState<DiffLine[]>([])
   const [stats, setStats] = useState({ added: 0, removed: 0 })
 
   const pasteOldJSON = async () => {
@@ -46,13 +53,13 @@ export default function JsonDiff() {
 
   const clearOldJSON = () => {
     setOldJson('')
-    setDiffOutput('')
+    setDiffOutput([])
     setStats({ added: 0, removed: 0 })
   }
 
   const clearNewJSON = () => {
     setNewJson('')
-    setDiffOutput('')
+    setDiffOutput([])
     setStats({ added: 0, removed: 0 })
   }
 
@@ -97,33 +104,39 @@ export default function JsonDiff() {
     }
   }
 
-  const generateDiff = (oldObj: any, newObj: any): string => {
-    const diff: string[] = []
+  const generateDiff = (oldObj: any, newObj: any): DiffLine[] => {
+    const diff: DiffLine[] = []
 
     // Find removed properties
     const removedKeys = Object.keys(oldObj).filter(key => !(key in newObj))
     removedKeys.forEach(key => {
-      diff.push(`<span class="diff-removed"><FontAwesomeIcon icon={faMinus} /> ${key}: ${JSON.stringify(oldObj[key])}</span>`)
+      diff.push({ type: 'removed', key, oldValue: JSON.stringify(oldObj[key]) })
     })
 
     // Find added properties
     const addedKeys = Object.keys(newObj).filter(key => !(key in oldObj))
     addedKeys.forEach(key => {
-      diff.push(`<span class="diff-added"><FontAwesomeIcon icon={faPlus} /> ${key}: ${JSON.stringify(newObj[key])}</span>`)
+      diff.push({ type: 'added', key, newValue: JSON.stringify(newObj[key]) })
     })
 
     // Find modified properties
     const commonKeys = Object.keys(oldObj).filter(key => key in newObj)
     commonKeys.forEach(key => {
       if (JSON.stringify(oldObj[key]) !== JSON.stringify(newObj[key])) {
-        diff.push(`<div class="diff-modified">`)
-        diff.push(`  <span class="diff-removed"><FontAwesomeIcon icon={faMinus} /> ${key}: ${JSON.stringify(oldObj[key])}</span>`)
-        diff.push(`  <span class="diff-added"><FontAwesomeIcon icon={faPlus} /> ${key}: ${JSON.stringify(newObj[key])}</span>`)
-        diff.push(`</div>`)
+        diff.push({
+          type: 'modified',
+          key,
+          oldValue: JSON.stringify(oldObj[key]),
+          newValue: JSON.stringify(newObj[key])
+        })
       }
     })
 
-    return diff.length > 0 ? diff.join('\n') : '<div class="diff-unchanged">两个 JSON 对象完全相同</div>'
+    if (diff.length === 0) {
+      diff.push({ type: 'unchanged', key: '' })
+    }
+
+    return diff
   }
 
   const countAdded = (oldObj: any, newObj: any): number => {
@@ -156,10 +169,19 @@ export default function JsonDiff() {
     return count
   }
 
+  const diffToText = (): string => {
+    return diffOutput.map(line => {
+      if (line.type === 'unchanged') return '两个 JSON 对象完全相同'
+      if (line.type === 'added') return `+ ${line.key}: ${line.newValue}`
+      if (line.type === 'removed') return `- ${line.key}: ${line.oldValue}`
+      return `~ ${line.key}:\n  - ${line.oldValue}\n  + ${line.newValue}`
+    }).join('\n')
+  }
+
   const copyDiff = async () => {
-    if (!diffOutput) return
+    if (diffOutput.length === 0) return
     try {
-      await navigator.clipboard.writeText(diffOutput)
+      await navigator.clipboard.writeText(diffToText())
       alert('已复制差异结果')
     } catch (err) {
       alert('复制失败')
@@ -167,8 +189,8 @@ export default function JsonDiff() {
   }
 
   const downloadDiff = () => {
-    if (!diffOutput) return
-    const blob = new Blob([diffOutput], { type: 'text/plain' })
+    if (diffOutput.length === 0) return
+    const blob = new Blob([diffToText()], { type: 'text/plain' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
@@ -249,7 +271,7 @@ export default function JsonDiff() {
           </div>
 
           {/* Diff Output */}
-          {diffOutput && (
+          {diffOutput.length > 0 && (
             <div className="panel">
               <div className="panel-header">
                 <div className="panel-title">
@@ -274,9 +296,39 @@ export default function JsonDiff() {
               </div>
               <div className="panel-content">
                 <div className="diff-result">
-                  {diffOutput.split('\n').map((line, index) => (
-                    <div key={index} className="diff-item" dangerouslySetInnerHTML={{ __html: line }} />
-                  ))}
+                  {diffOutput.map((line, index) => {
+                    if (line.type === 'unchanged') {
+                      return (
+                        <div key={index} className="diff-item diff-unchanged">
+                          两个 JSON 对象完全相同
+                        </div>
+                      )
+                    }
+                    if (line.type === 'added') {
+                      return (
+                        <div key={index} className="diff-item diff-added">
+                          <FontAwesomeIcon icon={faPlus} /> {line.key}: {line.newValue}
+                        </div>
+                      )
+                    }
+                    if (line.type === 'removed') {
+                      return (
+                        <div key={index} className="diff-item diff-removed">
+                          <FontAwesomeIcon icon={faMinus} /> {line.key}: {line.oldValue}
+                        </div>
+                      )
+                    }
+                    return (
+                      <div key={index} className="diff-item diff-modified">
+                        <div className="diff-removed">
+                          <FontAwesomeIcon icon={faMinus} /> {line.key}: {line.oldValue}
+                        </div>
+                        <div className="diff-added">
+                          <FontAwesomeIcon icon={faPlus} /> {line.key}: {line.newValue}
+                        </div>
+                      </div>
+                    )
+                  })}
                 </div>
               </div>
             </div>

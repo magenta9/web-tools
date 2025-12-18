@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
   faKey,
@@ -12,14 +12,12 @@ import {
   faCode,
   faCheck,
   faArrowUp,
-  faHistory,
-  faTrashAlt,
-  faTimes,
-  faInbox,
-  faUpload,
-  faTrash
+  faHistory
 } from '@fortawesome/free-solid-svg-icons'
 import Layout from '../components/Layout'
+import { HistoryPanel } from '../components/HistoryPanel'
+import { useHistory } from '../hooks/useHistory'
+import { copyToClipboard, pasteFromClipboard, formatBytes } from '../utils'
 import '../tools.css'
 
 interface UrlItem {
@@ -28,7 +26,7 @@ interface UrlItem {
   icon: string
 }
 
-interface HistoryItem {
+interface ImageHistoryItem {
   type: 'key_to_url' | 'url_to_key'
   input: string
   output: string
@@ -41,31 +39,18 @@ export default function ImageConverter() {
   const [urlInput, setUrlInput] = useState('')
   const [urlOutput, setUrlOutput] = useState<UrlItem[]>([])
   const [keyOutput, setKeyOutput] = useState('')
-  const [historyVisible, setHistoryVisible] = useState(false)
-  const [history, setHistory] = useState<HistoryItem[]>([])
+  const {
+    history,
+    historyVisible,
+    saveToHistory,
+    deleteHistoryItem,
+    clearAllHistory,
+    showHistory,
+    hideHistory
+  } = useHistory<ImageHistoryItem>({ storageKey: 'image_history' })
 
-  useEffect(() => {
-    loadHistory()
-  }, [])
-
-  const loadHistory = () => {
-    const savedHistory = localStorage.getItem('image_history')
-    if (savedHistory) {
-      setHistory(JSON.parse(savedHistory))
-    }
-  }
-
-  const saveToHistory = (type: HistoryItem['type'], input: string, output: string) => {
-    const newHistory: HistoryItem = {
-      type,
-      input,
-      output,
-      timestamp: new Date().getTime()
-    }
-
-    const updatedHistory = [newHistory, ...history].slice(0, 100)
-    setHistory(updatedHistory)
-    localStorage.setItem('image_history', JSON.stringify(updatedHistory))
+  const addToHistory = (type: ImageHistoryItem['type'], input: string, output: string) => {
+    saveToHistory({ type, input, output })
   }
 
   const convertKeyToUrls = () => {
@@ -88,7 +73,7 @@ export default function ImageConverter() {
 
     setUrlOutput(urls)
     const outputText = urls.map(u => u.url).join('\n')
-    saveToHistory('key_to_url', key, outputText)
+    addToHistory('key_to_url', key, outputText)
     alert('转换成功')
   }
 
@@ -126,20 +111,16 @@ export default function ImageConverter() {
       }
 
       setKeyOutput(key)
-      saveToHistory('url_to_key', url, key)
+      addToHistory('url_to_key', url, key)
       alert('提取成功')
     } catch (error) {
       alert('提取失败: ' + (error as Error).message)
     }
   }
 
-  const copyToClipboard = async (text: string) => {
-    try {
-      await navigator.clipboard.writeText(text)
-      alert('已复制到剪贴板')
-    } catch (err) {
-      alert('复制失败')
-    }
+  const handleCopy = async (text: string) => {
+    const success = await copyToClipboard(text)
+    alert(success ? '已复制到剪贴板' : '复制失败')
   }
 
   const copyAllUrls = async () => {
@@ -148,24 +129,20 @@ export default function ImageConverter() {
       return
     }
 
-    try {
-      await navigator.clipboard.writeText(urlOutput.map(u => u.url).join('\n'))
-      alert('已复制所有 URLs')
-    } catch (err) {
-      alert('复制失败')
-    }
+    const success = await copyToClipboard(urlOutput.map(u => u.url).join('\n'))
+    alert(success ? '已复制所有 URLs' : '复制失败')
   }
 
-  const pasteFromClipboard = async (type: 'key' | 'url') => {
-    try {
-      const text = await navigator.clipboard.readText()
+  const handlePaste = async (type: 'key' | 'url') => {
+    const text = await pasteFromClipboard()
+    if (text !== null) {
       if (type === 'key') {
         setKeyInput(text)
       } else {
         setUrlInput(text)
       }
       alert('已粘贴')
-    } catch (err) {
+    } else {
       alert('无法读取剪贴板')
     }
   }
@@ -182,72 +159,23 @@ export default function ImageConverter() {
     }
   }
 
-  const clearAllHistory = () => {
-    if (window.confirm('确定要清空所有历史记录吗？此操作不可恢复！')) {
-      setHistory([])
-      localStorage.removeItem('image_history')
-      alert('已清空所有历史记录')
-    }
-  }
-
-  const deleteHistoryItem = (index: number) => {
-    if (window.confirm('确定要删除这条历史记录吗？')) {
-      const updatedHistory = history.filter((_, i) => i !== index)
-      setHistory(updatedHistory)
-      localStorage.setItem('image_history', JSON.stringify(updatedHistory))
-      alert('已删除历史记录')
-    }
-  }
-
-  const loadFromHistory = (item: HistoryItem, type: 'input' | 'key' | 'url') => {
-    if (type === 'input') {
-      if (item.type === 'key_to_url') {
-        setKeyInput(item.input)
-        setActiveTab('key-to-url')
-      } else {
-        setUrlInput(item.input)
-        setActiveTab('url-to-key')
-      }
-    } else if (type === 'key' && item.type === 'key_to_url') {
+  const loadFromHistory = (item: ImageHistoryItem) => {
+    if (item.type === 'key_to_url') {
       setKeyInput(item.input)
       setActiveTab('key-to-url')
-    } else if (type === 'url' && item.type === 'url_to_key') {
+    } else {
       setUrlInput(item.input)
       setActiveTab('url-to-key')
     }
-    alert(`已加载${type === 'input' ? '输入' : type === 'key' ? 'Key' : 'URL'}`)
+    hideHistory()
   }
 
   const handleUrlClick = (url: string, event: React.MouseEvent) => {
     if (event.ctrlKey || event.metaKey) {
       window.open(url, '_blank', 'noopener,noreferrer')
     } else {
-      copyToClipboard(url)
+      handleCopy(url)
     }
-  }
-
-  const formatBytes = (bytes: number): string => {
-    if (bytes === 0) return '0 B'
-    const k = 1024
-    const sizes = ['B', 'KB', 'MB']
-    const i = Math.floor(Math.log(bytes) / Math.log(k))
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
-  }
-
-  const formatTimestamp = (timestamp: number): string => {
-    const date = new Date(timestamp)
-    const now = new Date()
-    const diffMs = now.getTime() - date.getTime()
-    const diffMins = Math.floor(diffMs / 60000)
-    const diffHours = Math.floor(diffMs / 3600000)
-    const diffDays = Math.floor(diffMs / 86400000)
-
-    if (diffMins < 1) return '刚刚'
-    if (diffMins < 60) return `${diffMins}分钟前`
-    if (diffHours < 24) return `${diffHours}小时前`
-    if (diffDays < 7) return `${diffDays}天前`
-
-    return date.toLocaleDateString('zh-CN')
   }
 
   return (
@@ -280,7 +208,7 @@ export default function ImageConverter() {
                         <FontAwesomeIcon icon={faKey} /> INPUT KEY
                       </div>
                       <div className="panel-actions">
-                        <button className="panel-btn" onClick={() => pasteFromClipboard('key')}>
+                        <button className="panel-btn" onClick={() => handlePaste('key')}>
                           <FontAwesomeIcon icon={faPaste} /> PASTE
                         </button>
                         <button className="panel-btn" onClick={() => loadExample('key')}>
@@ -301,7 +229,7 @@ export default function ImageConverter() {
                         <span>{formatBytes(keyInput.length)} bytes</span>
                         <button
                           className="panel-btn"
-                          onClick={() => setHistoryVisible(true)}
+                          onClick={showHistory}
                           style={{ marginLeft: '10px' }}
                         >
                           <FontAwesomeIcon icon={faHistory} /> 历史记录
@@ -344,7 +272,7 @@ export default function ImageConverter() {
                               <div className="url-item-actions">
                                 <button
                                   className="cyber-btn-small"
-                                  onClick={() => copyToClipboard(item.url)}
+                                  onClick={() => handleCopy(item.url)}
                                 >
                                   <FontAwesomeIcon icon={faCopy} /> 复制
                                 </button>
@@ -374,7 +302,7 @@ export default function ImageConverter() {
                         <FontAwesomeIcon icon={faLink} /> INPUT URL
                       </div>
                       <div className="panel-actions">
-                        <button className="panel-btn" onClick={() => pasteFromClipboard('url')}>
+                        <button className="panel-btn" onClick={() => handlePaste('url')}>
                           <FontAwesomeIcon icon={faPaste} /> PASTE
                         </button>
                         <button className="panel-btn" onClick={() => loadExample('url')}>
@@ -395,7 +323,7 @@ export default function ImageConverter() {
                         <span>{formatBytes(urlInput.length)} bytes</span>
                         <button
                           className="panel-btn"
-                          onClick={() => setHistoryVisible(true)}
+                          onClick={showHistory}
                           style={{ marginLeft: '10px' }}
                         >
                           <FontAwesomeIcon icon={faHistory} /> 历史记录
@@ -414,7 +342,7 @@ export default function ImageConverter() {
                         <FontAwesomeIcon icon={faKey} /> OUTPUT KEY
                       </div>
                       <div className="panel-actions">
-                        <button className="panel-btn" onClick={() => keyOutput && copyToClipboard(keyOutput)}>
+                        <button className="panel-btn" onClick={() => keyOutput && handleCopy(keyOutput)}>
                           <FontAwesomeIcon icon={faCopy} /> COPY
                         </button>
                       </div>
@@ -432,7 +360,7 @@ export default function ImageConverter() {
                           <div className="url-item-actions">
                             <button
                               className="cyber-btn-small"
-                              onClick={() => copyToClipboard(keyOutput)}
+                              onClick={() => handleCopy(keyOutput)}
                             >
                               <FontAwesomeIcon icon={faCopy} /> 复制
                             </button>
@@ -452,146 +380,17 @@ export default function ImageConverter() {
           </div>
         </div>
 
-        {/* History Panel */}
-        {historyVisible && (
-          <div className="history-panel active">
-            <div className="history-content">
-              <div className="history-header">
-                <h2 className="history-title">
-                  <FontAwesomeIcon icon={faHistory} /> CONVERSION HISTORY
-                </h2>
-                <div>
-                  <button
-                    className="cyber-btn-small"
-                    onClick={clearAllHistory}
-                    style={{ marginRight: '10px' }}
-                  >
-                    <FontAwesomeIcon icon={faTrashAlt} /> CLEAR ALL
-                  </button>
-                  <button
-                    className="cyber-btn-small"
-                    onClick={() => setHistoryVisible(false)}
-                  >
-                    <FontAwesomeIcon icon={faTimes} /> CLOSE
-                  </button>
-                </div>
-              </div>
-              <div className="history-list">
-                {history.length > 0 ? (
-                  history.map((item, index) => (
-                    <div key={index} className="history-item">
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '10px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                          <span
-                            style={{
-                              padding: '2px 8px',
-                              borderRadius: '4px',
-                              fontSize: '12px',
-                              fontFamily: 'Orbitron, monospace',
-                              background: item.type === 'key_to_url' ? 'rgba(0, 255, 255, 0.1)' : 'rgba(255, 0, 110, 0.1)',
-                              color: item.type === 'key_to_url' ? 'var(--neon-cyan)' : 'var(--neon-pink)',
-                              border: `1px solid ${item.type === 'key_to_url' ? 'var(--border-color)' : 'rgba(255, 0, 110, 0.3)'}`
-                            }}
-                          >
-                            {item.type === 'key_to_url' ? 'Key → URLs' : 'URL → Key'}
-                          </span>
-                          <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
-                            {formatTimestamp(item.timestamp)}
-                          </span>
-                        </div>
-                        <button
-                          onClick={() => deleteHistoryItem(index)}
-                          className="panel-btn"
-                          style={{ color: 'var(--neon-pink)', borderColor: 'var(--neon-pink)' }}
-                        >
-                          <FontAwesomeIcon icon={faTrash} />
-                        </button>
-                      </div>
-                      <div style={{ marginBottom: '10px' }}>
-                        <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '5px', fontFamily: 'Orbitron, monospace' }}>输入:</div>
-                        <div style={{
-                          fontFamily: 'JetBrains Mono, monospace',
-                          fontSize: '12px',
-                          color: 'var(--text-primary)',
-                          background: 'rgba(0, 0, 0, 0.2)',
-                          padding: '8px',
-                          borderRadius: '4px',
-                          maxHeight: '80px',
-                          overflowY: 'auto',
-                          wordBreak: 'break-all'
-                        }}>
-                          {item.input.length > 200 ? item.input.substring(0, 200) + '...' : item.input}
-                        </div>
-                      </div>
-                      <div style={{ marginBottom: '10px' }}>
-                        <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '5px', fontFamily: 'Orbitron, monospace' }}>输出:</div>
-                        <div style={{
-                          fontFamily: 'JetBrains Mono, monospace',
-                          fontSize: '12px',
-                          color: 'var(--text-primary)',
-                          background: 'rgba(0, 0, 0, 0.2)',
-                          padding: '8px',
-                          borderRadius: '4px',
-                          maxHeight: '80px',
-                          overflowY: 'auto'
-                        }}>
-                          {item.type === 'key_to_url' ?
-                            item.output.split('\n').map((url, i) => (
-                              <div
-                                key={i}
-                                style={{
-                                  cursor: 'pointer',
-                                  color: 'var(--text-primary)',
-                                  padding: '2px 0'
-                                }}
-                                onMouseOver={(e) => e.currentTarget.style.color = 'var(--neon-cyan)'}
-                                onMouseOut={(e) => e.currentTarget.style.color = 'var(--text-primary)'}
-                                onClick={(e) => handleUrlClick(url.trim(), e)}
-                                title="点击复制，Ctrl+点击打开链接"
-                              >
-                                {url.trim().length > 200 ? url.trim().substring(0, 200) + '...' : url.trim()}
-                              </div>
-                            )) :
-                            <div>{item.output.length > 200 ? item.output.substring(0, 200) + '...' : item.output}</div>
-                          }
-                        </div>
-                      </div>
-                      <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
-                        <button
-                          onClick={() => loadFromHistory(item, 'input')}
-                          className="cyber-btn-small"
-                        >
-                          <FontAwesomeIcon icon={faUpload} /> 加载输入
-                        </button>
-                        {item.type === 'key_to_url' && (
-                          <button
-                            onClick={() => loadFromHistory(item, 'key')}
-                            className="cyber-btn-small"
-                          >
-                            <FontAwesomeIcon icon={faKey} /> 加载Key
-                          </button>
-                        )}
-                        {item.type === 'url_to_key' && (
-                          <button
-                            onClick={() => loadFromHistory(item, 'url')}
-                            className="cyber-btn-small"
-                          >
-                            <FontAwesomeIcon icon={faLink} /> 加载URL
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="empty-state">
-                    <FontAwesomeIcon icon={faInbox} />
-                    <p>暂无历史记录</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
+        <HistoryPanel
+          visible={historyVisible}
+          title="CONVERSION HISTORY"
+          history={history}
+          onClose={hideHistory}
+          onClearAll={clearAllHistory}
+          onDelete={deleteHistoryItem}
+          onLoad={loadFromHistory}
+          renderItemLabel={(item) => item.type === 'key_to_url' ? 'Key → URLs' : 'URL → Key'}
+          renderItemPreview={(item) => item.input.length > 200 ? item.input.substring(0, 200) + '...' : item.input}
+        />
       </div>
     </Layout>
   )

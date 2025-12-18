@@ -9,13 +9,15 @@ import {
   faPaste,
   faTrash,
   faHistory,
-  faExchangeAlt,
-  faTimes
+  faExchangeAlt
 } from '@fortawesome/free-solid-svg-icons'
 import Layout from '../components/Layout'
+import { HistoryPanel } from '../components/HistoryPanel'
+import { useHistory } from '../hooks/useHistory'
+import { copyToClipboard, pasteFromClipboard } from '../utils'
 import '../tools.css'
 
-interface HistoryItem {
+interface TimestampHistoryItem {
   type: 'timestamp_to_date' | 'date_to_timestamp'
   input: string
   output: string
@@ -26,27 +28,18 @@ export default function TimestampConverter() {
   const [timestamp, setTimestamp] = useState('')
   const [date, setDate] = useState('')
   const [results, setResults] = useState<any[]>([])
-  const [history, setHistory] = useState<HistoryItem[]>([])
-  const [historyVisible, setHistoryVisible] = useState(false)
+  const {
+    history,
+    historyVisible,
+    saveToHistory,
+    deleteHistoryItem,
+    clearAllHistory,
+    showHistory,
+    hideHistory
+  } = useHistory<TimestampHistoryItem>({ storageKey: 'timestamp_history' })
 
-  const loadHistory = () => {
-    const savedHistory = localStorage.getItem('timestamp_history')
-    if (savedHistory) {
-      setHistory(JSON.parse(savedHistory))
-    }
-  }
-
-  const saveToHistory = (type: HistoryItem['type'], input: string, output: string) => {
-    const newHistory: HistoryItem = {
-      type,
-      input,
-      output,
-      timestamp: new Date().getTime()
-    }
-
-    const updatedHistory = [newHistory, ...history].slice(0, 100)
-    setHistory(updatedHistory)
-    localStorage.setItem('timestamp_history', JSON.stringify(updatedHistory))
+  const addToHistory = (type: TimestampHistoryItem['type'], input: string, output: string) => {
+    saveToHistory({ type, input, output })
   }
 
   const convertTimestampToDate = () => {
@@ -96,7 +89,7 @@ export default function TimestampConverter() {
 
       setResults(conversions)
       const output = conversions.map(c => `${c.label}: ${c.value}`).join('\n')
-      saveToHistory('timestamp_to_date', ts, output)
+      addToHistory('timestamp_to_date', ts, output)
     } catch (err) {
       alert((err as Error).message)
     }
@@ -128,7 +121,7 @@ export default function TimestampConverter() {
 
       setResults(conversions)
       const output = conversions.map(c => `${c.label}: ${c.value}`).join('\n')
-      saveToHistory('date_to_timestamp', dateStr, output)
+      addToHistory('date_to_timestamp', dateStr, output)
     } catch (err) {
       alert((err as Error).message)
     }
@@ -144,25 +137,21 @@ export default function TimestampConverter() {
     setDate(now.toISOString())
   }
 
-  const copyToClipboard = async (text: string) => {
-    try {
-      await navigator.clipboard.writeText(text)
-      alert('已复制到剪贴板')
-    } catch (err) {
-      alert('复制失败')
-    }
+  const handleCopy = async (text: string) => {
+    const success = await copyToClipboard(text)
+    alert(success ? '已复制到剪贴板' : '复制失败')
   }
 
-  const pasteFromClipboard = async (type: 'timestamp' | 'date') => {
-    try {
-      const text = await navigator.clipboard.readText()
+  const handlePaste = async (type: 'timestamp' | 'date') => {
+    const text = await pasteFromClipboard()
+    if (text !== null) {
       if (type === 'timestamp') {
         setTimestamp(text)
       } else {
         setDate(text)
       }
       alert('已粘贴')
-    } catch (err) {
+    } else {
       alert('无法读取剪贴板')
     }
   }
@@ -186,38 +175,13 @@ export default function TimestampConverter() {
     }
   }
 
-  const clearHistory = () => {
-    if (window.confirm('确定要清空所有历史记录吗？')) {
-      setHistory([])
-      localStorage.removeItem('timestamp_history')
-      alert('已清空历史记录')
-    }
-  }
-
-  const loadFromHistory = (item: HistoryItem) => {
+  const loadFromHistory = (item: TimestampHistoryItem) => {
     if (item.type === 'timestamp_to_date') {
       setTimestamp(item.input)
     } else {
       setDate(item.input)
     }
-    setHistoryVisible(false)
-    alert('已加载历史记录')
-  }
-
-  const formatTimestamp = (timestamp: number): string => {
-    const date = new Date(timestamp)
-    const now = new Date()
-    const diffMs = now.getTime() - date.getTime()
-    const diffMins = Math.floor(diffMs / 60000)
-    const diffHours = Math.floor(diffMs / 3600000)
-    const diffDays = Math.floor(diffMs / 86400000)
-
-    if (diffMins < 1) return '刚刚'
-    if (diffMins < 60) return `${diffMins}分钟前`
-    if (diffHours < 24) return `${diffHours}小时前`
-    if (diffDays < 7) return `${diffDays}天前`
-
-    return date.toLocaleDateString('zh-CN')
+    hideHistory()
   }
 
   return (
@@ -235,7 +199,7 @@ export default function TimestampConverter() {
                   <button className="panel-btn" onClick={getCurrentTimestamp}>
                     当前时间戳
                   </button>
-                  <button className="panel-btn" onClick={() => pasteFromClipboard('timestamp')}>
+                  <button className="panel-btn" onClick={() => handlePaste('timestamp')}>
                     <FontAwesomeIcon icon={faPaste} /> 粘贴
                   </button>
                   <button className="panel-btn" onClick={() => setTimestamp('')}>
@@ -267,7 +231,7 @@ export default function TimestampConverter() {
                   <button className="panel-btn" onClick={getCurrentDate}>
                     当前日期
                   </button>
-                  <button className="panel-btn" onClick={() => pasteFromClipboard('date')}>
+                  <button className="panel-btn" onClick={() => handlePaste('date')}>
                     <FontAwesomeIcon icon={faPaste} /> 粘贴
                   </button>
                   <button className="panel-btn" onClick={() => setDate('')}>
@@ -314,7 +278,7 @@ export default function TimestampConverter() {
                       <div className="timestamp-value">{result.value}</div>
                       <button
                         className="panel-btn"
-                        onClick={() => copyToClipboard(result.value.toString())}
+                        onClick={() => handleCopy(result.value.toString())}
                         style={{ marginTop: '8px' }}
                       >
                         <FontAwesomeIcon icon={faCopy} /> 复制
@@ -330,77 +294,24 @@ export default function TimestampConverter() {
           <div style={{ textAlign: 'center', margin: '20px 0' }}>
             <button
               className="panel-btn"
-              onClick={() => setHistoryVisible(true)}
+              onClick={showHistory}
             >
               <FontAwesomeIcon icon={faHistory} /> 历史记录
             </button>
           </div>
         </div>
 
-        {/* History Panel */}
-        {historyVisible && (
-          <div className="history-panel active">
-            <div className="history-content">
-              <div className="history-header">
-                <h2 className="history-title">
-                  <FontAwesomeIcon icon={faHistory} /> 转换历史
-                </h2>
-                <div>
-                  <button
-                    className="cyber-btn-small"
-                    onClick={clearHistory}
-                    style={{ marginRight: '10px' }}
-                  >
-                    <FontAwesomeIcon icon={faTrash} /> 清空
-                  </button>
-                  <button
-                    className="cyber-btn-small"
-                    onClick={() => setHistoryVisible(false)}
-                  >
-                    <FontAwesomeIcon icon={faTimes} /> 关闭
-                  </button>
-                </div>
-              </div>
-              <div className="history-list">
-                {history.length > 0 ? (
-                  history.map((item, index) => (
-                    <div key={index} className="history-item">
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                        <span style={{
-                          padding: '2px 8px',
-                          borderRadius: '4px',
-                          fontSize: '12px',
-                          fontFamily: 'Orbitron, monospace',
-                          background: 'rgba(0, 255, 255, 0.1)',
-                          color: 'var(--accent-color)',
-                          border: '1px solid var(--border-color)'
-                        }}>
-                          {item.type === 'timestamp_to_date' ? '时间戳 → 日期' : '日期 → 时间戳'}
-                        </span>
-                        <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
-                          {formatTimestamp(item.timestamp)}
-                        </span>
-                      </div>
-                      <div style={{ fontSize: '14px', color: 'var(--text-primary)', marginBottom: '10px' }}>
-                        输入: {item.input}
-                      </div>
-                      <button
-                        onClick={() => loadFromHistory(item)}
-                        className="cyber-btn-small"
-                      >
-                        加载
-                      </button>
-                    </div>
-                  ))
-                ) : (
-                  <div className="empty-state">
-                    <p>暂无历史记录</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
+        <HistoryPanel
+          visible={historyVisible}
+          title="转换历史"
+          history={history}
+          onClose={hideHistory}
+          onClearAll={clearAllHistory}
+          onDelete={deleteHistoryItem}
+          onLoad={loadFromHistory}
+          renderItemLabel={(item) => item.type === 'timestamp_to_date' ? '时间戳 → 日期' : '日期 → 时间戳'}
+          renderItemPreview={(item) => `输入: ${item.input}`}
+        />
       </div>
     </Layout>
   )
