@@ -198,17 +198,17 @@ export default function JsonDiff() {
             <div className="panel">
               <div className="panel-header">
                 <div className="panel-title">
-                  <FontAwesomeIcon icon={faFileCode} /> 原始 JSON
+                  <FontAwesomeIcon icon={faFileCode} /> Original JSON
                 </div>
                 <div className="panel-actions">
                   <button className="panel-btn" onClick={pasteOldJSON}>
-                    <FontAwesomeIcon icon={faPaste} /> 粘贴
+                    <FontAwesomeIcon icon={faPaste} /> Paste
                   </button>
                   <button className="panel-btn" onClick={loadOldExample}>
-                    <FontAwesomeIcon icon={faCode} /> 示例
+                    <FontAwesomeIcon icon={faCode} /> Example
                   </button>
                   <button className="panel-btn" onClick={clearOldJSON}>
-                    <FontAwesomeIcon icon={faTrash} /> 清空
+                    <FontAwesomeIcon icon={faTrash} /> Clear
                   </button>
                 </div>
               </div>
@@ -217,7 +217,7 @@ export default function JsonDiff() {
                   value={oldJson}
                   onChange={(e) => setOldJson(e.target.value)}
                   className="code-textarea"
-                  placeholder='输入原始 JSON 数据'
+                  placeholder='Enter original JSON data'
                 />
               </div>
             </div>
@@ -226,17 +226,17 @@ export default function JsonDiff() {
             <div className="panel">
               <div className="panel-header">
                 <div className="panel-title">
-                  <FontAwesomeIcon icon={faFileCode} /> 新的 JSON
+                  <FontAwesomeIcon icon={faFileCode} /> New JSON
                 </div>
                 <div className="panel-actions">
                   <button className="panel-btn" onClick={pasteNewJSON}>
-                    <FontAwesomeIcon icon={faPaste} /> 粘贴
+                    <FontAwesomeIcon icon={faPaste} /> Paste
                   </button>
                   <button className="panel-btn" onClick={loadNewExample}>
-                    <FontAwesomeIcon icon={faCode} /> 示例
+                    <FontAwesomeIcon icon={faCode} /> Example
                   </button>
                   <button className="panel-btn" onClick={clearNewJSON}>
-                    <FontAwesomeIcon icon={faTrash} /> 清空
+                    <FontAwesomeIcon icon={faTrash} /> Clear
                   </button>
                 </div>
               </div>
@@ -245,7 +245,7 @@ export default function JsonDiff() {
                   value={newJson}
                   onChange={(e) => setNewJson(e.target.value)}
                   className="code-textarea"
-                  placeholder='输入新的 JSON 数据'
+                  placeholder='Enter new JSON data'
                 />
               </div>
             </div>
@@ -253,8 +253,8 @@ export default function JsonDiff() {
 
           {/* Compare Button */}
           <div style={{ textAlign: 'center', margin: '20px 0' }}>
-            <button className="cyber-btn-small" onClick={compareJSON}>
-              <FontAwesomeIcon icon={faCodeCompare} /> 对比 JSON
+            <button className="sketch-btn-small" onClick={compareJSON}>
+              <FontAwesomeIcon icon={faCodeCompare} /> Compare JSON
             </button>
           </div>
 
@@ -263,22 +263,22 @@ export default function JsonDiff() {
             <div className="panel">
               <div className="panel-header">
                 <div className="panel-title">
-                  <FontAwesomeIcon icon={faMinusCircle} /> 对比结果
+                  <FontAwesomeIcon icon={faMinusCircle} /> Diff Result
                   <span style={{ marginLeft: '20px', fontSize: '14px' }}>
-                    <span style={{ color: '#22c55e' }}>
-                      <FontAwesomeIcon icon={faPlus} /> 新增: {stats.added}
+                    <span style={{ color: 'var(--accent-tertiary)' }}>
+                      <FontAwesomeIcon icon={faPlus} /> Added: {stats.added}
                     </span>
-                    <span style={{ marginLeft: '10px', color: '#ef4444' }}>
-                      <FontAwesomeIcon icon={faMinus} /> 删除: {stats.removed}
+                    <span style={{ marginLeft: '10px', color: 'var(--accent-color)' }}>
+                      <FontAwesomeIcon icon={faMinus} /> Removed: {stats.removed}
                     </span>
                   </span>
                 </div>
                 <div className="panel-actions">
                   <button className="panel-btn" onClick={copyDiff}>
-                    <FontAwesomeIcon icon={faCopy} /> 复制
+                    <FontAwesomeIcon icon={faCopy} /> Copy
                   </button>
                   <button className="panel-btn" onClick={downloadDiff}>
-                    <FontAwesomeIcon icon={faDownload} /> 下载
+                    <FontAwesomeIcon icon={faDownload} /> Download
                   </button>
                 </div>
               </div>
@@ -288,7 +288,7 @@ export default function JsonDiff() {
                     if (line.type === 'unchanged') {
                       return (
                         <div key={index} className="diff-item diff-unchanged">
-                          两个 JSON 对象完全相同
+                          Two JSON objects are identical
                         </div>
                       )
                     }

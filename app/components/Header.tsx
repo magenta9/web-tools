@@ -28,44 +28,36 @@ export default function Header() {
 
   return (
     <header className="header">
-      <div className="corner-decoration corner-tl"></div>
-      <div className="corner-decoration corner-tr"></div>
-
       <div className="header-content">
         <div className="logo">
           <div className="logo-icon">
             <FontAwesomeIcon icon={faImage} />
           </div>
           <div className="logo-text">
-            <h1 className="logo-title glitch">WEB TOOLS</h1>
-            <p className="logo-subtitle cyber-text">{'/* '} Developer Tools Suite v4.0 {' */'}</p>
+            <h1 className="logo-title">Web Tools</h1>
+            <p className="logo-subtitle">~ your handy developer toolkit ~</p>
           </div>
         </div>
 
         <nav className="nav">
-          {navItems.map((item, index) => (
+          {navItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
               className={`nav-link ${pathname === item.href ? 'active' : ''}`}
-              style={{ animationDelay: `${index * 0.1}s` }}
             >
               <FontAwesomeIcon icon={item.icon} /> {item.label}
             </Link>
           ))}
           <button
-            className="nav-link theme-toggle"
+            className="theme-toggle"
             onClick={toggleTheme}
+            title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
           >
             <FontAwesomeIcon icon={isDarkMode ? faSun : faMoon} />
-            <span style={{ marginLeft: '5px' }}>
-              {isDarkMode ? 'LIGHT' : 'DARK'}
-            </span>
           </button>
         </nav>
       </div>
-
-      <div className="loading-bar"></div>
     </header>
   )
 }
