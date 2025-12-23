@@ -264,11 +264,6 @@ export default function JsonTool() {
   return (
     <Layout>
       <div className="json-tool">
-        <div className="corner-decoration corner-tl"></div>
-        <div className="corner-decoration corner-tr"></div>
-        <div className="corner-decoration corner-bl"></div>
-        <div className="corner-decoration corner-br"></div>
-
         <div className="json-container">
           {/* Options Bar */}
           <div className="options-bar">
