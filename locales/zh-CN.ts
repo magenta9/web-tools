@@ -215,6 +215,18 @@ export const zhCN = {
         selectModel: '选择模型',
         historyTitle: 'AI SQL 查询历史',
     },
+    jsonfix: {
+        title: 'AI JSON 修复',
+        success: 'JSON 修复成功',
+        failed: 'JSON 修复失败',
+        fix: '修复 JSON',
+        aiFix: 'AI 修复',
+        retry: '重试',
+        realTimeMode: '实时模式',
+        selectModel: '选择模型',
+        indent: '缩进',
+        invalidOutput: '输出无效，请重试',
+    },
 }
 
 export type Locale = typeof zhCN

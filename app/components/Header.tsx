@@ -10,23 +10,55 @@ import {
   Key,
   Sun,
   Moon,
-  Database
+  Database,
+  FileJson,
+  ChevronDown,
+  Sparkles,
+  Wrench,
+  Languages
 } from 'lucide-react'
 import { useTheme } from '../providers/ThemeProvider'
-import { memo } from 'react'
+import { memo, useState, useRef } from 'react'
 
-const navItems = [
-  { href: '/json', label: 'JSON', Icon: Code },
-  { href: '/image', label: 'Image', Icon: Image },
-  { href: '/diff', label: 'Diff', Icon: GitCompare },
-  { href: '/timestamp', label: 'Timestamp', Icon: Clock },
-  { href: '/jwt', label: 'JWT', Icon: Key },
+const regularTools = [
+  { href: '/json', label: 'JSON Tool', Icon: Code },
+  { href: '/image', label: 'Image Converter', Icon: Image },
+  { href: '/diff', label: 'JSON Diff', Icon: GitCompare },
+  { href: '/timestamp', label: 'Timestamp Converter', Icon: Clock },
+  { href: '/jwt', label: 'JWT Tool', Icon: Key },
+]
+
+const aiTools = [
+  { href: '/jsonfix', label: 'AI JSON Fix', Icon: FileJson },
   { href: '/aisql', label: 'AI SQL', Icon: Database },
+  { href: '/translate', label: 'AI翻译', Icon: Languages },
 ]
 
 const Header = memo(function Header() {
   const pathname = usePathname()
   const { isDarkMode, toggleTheme } = useTheme()
+  const [regularDropdownOpen, setRegularDropdownOpen] = useState(false)
+  const [aiDropdownOpen, setAiDropdownOpen] = useState(false)
+  const closeTimerRef = useRef<Map<string, NodeJS.Timeout>>(new Map())
+
+  const clearCloseTimer = (key: string) => {
+    const timer = closeTimerRef.current.get(key)
+    if (timer) {
+      clearTimeout(timer)
+      closeTimerRef.current.delete(key)
+    }
+  }
+
+  const handleDropdownLeave = (key: string, setter: (val: boolean) => void) => {
+    const timer = setTimeout(() => {
+      setter(false)
+    }, 300)
+    closeTimerRef.current.set(key, timer)
+  }
+
+  const handleDropdownEnter = (key: string) => {
+    clearCloseTimer(key)
+  }
 
   return (
     <header className="header">
@@ -43,16 +75,92 @@ const Header = memo(function Header() {
           </Link>
 
           <nav className="nav">
-            {navItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`nav-link ${pathname === item.href ? 'active' : ''}`}
+            {/* Regular Tools Dropdown */}
+            <div
+              className="dropdown"
+              onMouseLeave={() => handleDropdownLeave('regular', setRegularDropdownOpen)}
+            >
+              <button
+                className="nav-link dropdown-toggle"
+                onMouseEnter={() => {
+                  handleDropdownEnter('regular')
+                  setRegularDropdownOpen(true)
+                }}
+                onClick={(e) => {
+                  e.preventDefault()
+                  setRegularDropdownOpen(!regularDropdownOpen)
+                }}
               >
-                <item.Icon size={16} />
-                {item.label}
-              </Link>
-            ))}
+                <Wrench size={16} />
+                普通工具
+                <ChevronDown size={14} className={`chevron ${regularDropdownOpen ? 'open' : ''}`} />
+              </button>
+              {regularDropdownOpen && (
+                <div
+                  className="dropdown-menu"
+                  onMouseEnter={() => handleDropdownEnter('regular')}
+                >
+                  {regularTools.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className={`dropdown-item ${pathname === item.href ? 'active' : ''}`}
+                      onClick={() => {
+                        clearCloseTimer('regular')
+                        setRegularDropdownOpen(false)
+                      }}
+                    >
+                      <item.Icon size={16} />
+                      {item.label}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* AI Tools Dropdown */}
+            <div
+              className="dropdown"
+              onMouseLeave={() => handleDropdownLeave('ai', setAiDropdownOpen)}
+            >
+              <button
+                className="nav-link dropdown-toggle ai-dropdown"
+                onMouseEnter={() => {
+                  handleDropdownEnter('ai')
+                  setAiDropdownOpen(true)
+                }}
+                onClick={(e) => {
+                  e.preventDefault()
+                  setAiDropdownOpen(!aiDropdownOpen)
+                }}
+              >
+                <Sparkles size={16} />
+                AI工具
+                <ChevronDown size={14} className={`chevron ${aiDropdownOpen ? 'open' : ''}`} />
+              </button>
+              {aiDropdownOpen && (
+                <div
+                  className="dropdown-menu"
+                  onMouseEnter={() => handleDropdownEnter('ai')}
+                >
+                  {aiTools.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className={`dropdown-item ${pathname === item.href ? 'active' : ''}`}
+                      onClick={() => {
+                        clearCloseTimer('ai')
+                        setAiDropdownOpen(false)
+                      }}
+                    >
+                      <item.Icon size={16} />
+                      {item.label}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+
             <button
               className="nav-link theme-toggle"
               onClick={toggleTheme}

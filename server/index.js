@@ -7,7 +7,7 @@ require('dotenv').config()
 
 const express = require('express')
 const cors = require('cors')
-const { generateSQL, chatWithOllama, getModels, OLLAMA_HOST } = require('./ollama')
+const { generateText, chatWithOllama, getModels, OLLAMA_HOST } = require('./ollama')
 const { getSchema, testConnection, getDatabases, executeQuery } = require('./database')
 
 const app = express()
@@ -74,11 +74,23 @@ Request: ${prompt}
 Write only the SQL query, nothing else. Do not include markdown code blocks.`
       : prompt
 
-    const sql = await generateSQL(fullPrompt, model)
+    // Generate SQL with specific options for code generation
+    const result = await generateText(fullPrompt, model, {
+      temperature: 0.1,
+      top_p: 0.9,
+      num_predict: 1000
+    })
+
+    // Clean up SQL response (remove markdown code blocks if present)
+    let cleanResult = result
+    // Remove markdown code block markers
+    cleanResult = cleanResult.replace(/```sql?/gi, '').replace(/```/g, '').trim()
+    // Remove leading "sql" language indicator
+    cleanResult = cleanResult.replace(/^sql\s*/i, '').trim()
 
     res.json({
       success: true,
-      sql
+      response: cleanResult
     })
   } catch (error) {
     console.error('SQL generation error:', error)
@@ -110,6 +122,101 @@ app.post('/api/ollama/chat', async (req, res) => {
       response
     })
   } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message
+    })
+  }
+})
+
+/**
+ * POST /api/ollama/translate
+ * Translate text using Ollama with different styles
+ */
+app.post('/api/ollama/translate', async (req, res) => {
+  const { text, sourceLang, targetLang, style, model } = req.body
+
+  if (!text || !sourceLang || !targetLang) {
+    return res.status(400).json({
+      success: false,
+      error: 'Text, source language, and target language are required'
+    })
+  }
+
+  if (sourceLang === targetLang) {
+    return res.status(400).json({
+      success: false,
+      error: 'Source and target languages cannot be the same'
+    })
+  }
+
+  try {
+    // Language mapping
+    const languageNames = {
+      'zh': 'Chinese',
+      'en': 'English',
+      'ja': 'Japanese'
+    }
+
+    const sourceLanguage = languageNames[sourceLang] || sourceLang
+    const targetLanguage = languageNames[targetLang] || targetLang
+
+    // Style-specific prompts
+    let styleInstruction = ''
+    switch (style) {
+      case 'casual':
+        styleInstruction = 'Use casual, conversational language that sounds natural and friendly. Prefer everyday expressions and colloquialisms where appropriate.'
+        break
+      case 'formal':
+        styleInstruction = 'Use formal, professional language with precise terminology. Maintain a serious, academic tone suitable for business or official documents.'
+        break
+      case 'standard':
+      default:
+        styleInstruction = 'Use clear, natural language that is neither too casual nor overly formal. Aim for accuracy and readability.'
+        break
+    }
+
+    // Construct the translation prompt
+    const prompt = `You are a professional translator specializing in ${sourceLanguage}, ${targetLanguage}, and cross-cultural communication.
+
+Task: Translate the following ${sourceLanguage} text to ${targetLanguage}.
+
+Style Guidelines: ${styleInstruction}
+
+Important Rules:
+1. Provide ONLY the translation, no explanations or additional text
+2. Maintain the original meaning and context
+3. Adapt cultural references appropriately for the target audience
+4. Preserve the tone and intent of the original text
+5. Use natural, fluent language in the target language
+6. If the text contains technical terms, translate them accurately
+7. For names and proper nouns, use standard transliterations
+
+Text to translate:
+${text}
+
+Translation:`
+
+    // Generate translation with specific options for translation
+    const translation = await generateText(prompt, model || 'llama3.2', {
+      temperature: 0.2,
+      top_p: 0.9,
+      num_predict: 2000
+    })
+
+    // Clean up the response - remove any extra explanations
+    const cleanTranslation = translation
+      .replace(/^Translation:\s*/i, '')
+      .replace(/^Here is the translation:\s*/i, '')
+      .replace(/^The translation is:\s*/i, '')
+      .trim()
+
+    res.json({
+      success: true,
+      translation: cleanTranslation
+    })
+  } catch (error) {
+    console.error('Translation error:', error)
     res.status(500).json({
       success: false,
       error: error.message

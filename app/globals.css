@@ -244,6 +244,99 @@ select:focus {
   color: var(--text-primary);
 }
 
+/* Dropdown Styles */
+.dropdown {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.dropdown-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  user-select: none;
+  z-index: 1002;
+}
+
+.dropdown-toggle .chevron {
+  transition: transform 0.2s ease;
+  pointer-events: none;
+}
+
+.dropdown-toggle .chevron.open {
+  transform: rotate(180deg);
+}
+
+.ai-dropdown {
+  color: var(--accent-color);
+}
+
+.ai-dropdown:hover {
+  color: var(--accent-hover);
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: var(--shadow-lg);
+  min-width: 200px;
+  z-index: 1001;
+  padding: 4px;
+  margin-top: 4px;
+  animation: dropdown-enter 0.15s ease-out;
+  pointer-events: auto;
+}
+
+@keyframes dropdown-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+}
+
+.dropdown-item:hover {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.dropdown-item.active {
+  background: var(--accent-color);
+  color: white;
+}
+
+.dropdown-item.active:hover {
+  background: var(--accent-hover);
+}
+
 /* Hero Section */
 .hero {
   text-align: center;
@@ -405,6 +498,7 @@ select:focus {
     opacity: 0;
     transform: translateX(20px);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -416,6 +510,7 @@ select:focus {
     opacity: 1;
     transform: translateX(0);
   }
+
   to {
     opacity: 0;
     transform: translateX(20px);
@@ -526,8 +621,13 @@ select:focus {
 }
 
 @keyframes fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes scale-in {
@@ -535,6 +635,7 @@ select:focus {
     opacity: 0;
     transform: scale(0.95);
   }
+
   to {
     opacity: 1;
     transform: scale(1);

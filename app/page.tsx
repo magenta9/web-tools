@@ -7,21 +7,17 @@ import {
   Clock,
   Key,
   Database,
-  FileJson
+  FileJson,
+  Sparkles,
+  Languages
 } from 'lucide-react'
 
-const tools = [
+const regularTools = [
   {
     href: '/json',
     title: 'JSON Tool',
     description: 'Format, validate, minify, and analyze JSON data',
     icon: Code
-  },
-  {
-    href: '/fixjson',
-    title: 'AI JSON Fix',
-    description: 'Fix non-standard JSON data with AI',
-    icon: FileJson
   },
   {
     href: '/image',
@@ -46,35 +42,75 @@ const tools = [
     title: 'JWT Tool',
     description: 'Encode and decode JWT tokens',
     icon: Key
+  }
+]
+
+const aiTools = [
+  {
+    href: '/jsonfix',
+    title: 'AI JSON Fix',
+    description: 'Fix non-standard JSON data with AI',
+    icon: FileJson
   },
   {
     href: '/aisql',
     title: 'AI SQL',
     description: 'Natural language to SQL with AI',
     icon: Database
+  },
+  {
+    href: '/translate',
+    title: 'AI翻译',
+    description: 'AI-powered translation between Chinese, English, and Japanese',
+    icon: Languages
   }
 ]
 
 export default function Home() {
   return (
     <Layout>
-      <div className="container">
-        <div className="hero">
-          <h1>Welcome to Web Tools</h1>
-          <p>A comprehensive suite of developer tools to make your life easier</p>
-        </div>
+      <div className="home">
+        <section className="hero">
+          <div className="hero-content">
+            <h1>Web Tools</h1>
+            <p>A collection of developer utilities to boost your productivity</p>
+          </div>
+        </section>
 
-        <div className="tools-grid">
-          {tools.map((tool) => (
-            <Link key={tool.href} href={tool.href} className="tool-card">
-              <div className="tool-icon">
-                <tool.icon size={24} />
-              </div>
-              <h3>{tool.title}</h3>
-              <p>{tool.description}</p>
-            </Link>
-          ))}
-        </div>
+        <section className="tools-section">
+          <div className="section-header">
+            <h2>Tools</h2>
+          </div>
+          <div className="tools-grid">
+            {regularTools.map((tool) => (
+              <Link key={tool.href} href={tool.href} className="tool-card">
+                <div className="tool-icon">
+                  <tool.icon size={24} />
+                </div>
+                <h3>{tool.title}</h3>
+                <p>{tool.description}</p>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        <section className="tools-section ai-section">
+          <div className="section-header ai-header">
+            <Sparkles size={20} />
+            <h2>AI Powered</h2>
+          </div>
+          <div className="tools-grid">
+            {aiTools.map((tool) => (
+              <Link key={tool.href} href={tool.href} className="tool-card ai-card">
+                <div className="tool-icon ai-icon">
+                  <tool.icon size={24} />
+                </div>
+                <h3>{tool.title}</h3>
+                <p>{tool.description}</p>
+              </Link>
+            ))}
+          </div>
+        </section>
       </div>
     </Layout>
   )

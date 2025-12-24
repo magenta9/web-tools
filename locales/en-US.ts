@@ -217,4 +217,16 @@ export const enUS: Locale = {
         selectModel: 'Select Model',
         historyTitle: 'AI SQL Query History',
     },
+    jsonfix: {
+        title: 'AI JSON Fix',
+        success: 'JSON fixed successfully',
+        failed: 'JSON fix failed',
+        fix: 'Fix JSON',
+        aiFix: 'AI Fix',
+        retry: 'Retry',
+        realTimeMode: 'Real-time Mode',
+        selectModel: 'Select Model',
+        indent: 'Indent',
+        invalidOutput: 'Invalid output, please retry',
+    },
 }
