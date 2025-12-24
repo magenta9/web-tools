@@ -1,8 +1,7 @@
 'use client'
 
 import React, { useEffect, useRef, useCallback } from 'react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons'
+import { AlertTriangle } from 'lucide-react'
 
 interface ConfirmDialogProps {
     isOpen: boolean
@@ -87,8 +86,8 @@ export function ConfirmDialog({
                 onClick={(e) => e.stopPropagation()}
             >
                 <h3 id="confirm-title" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <FontAwesomeIcon
-                        icon={faExclamationTriangle}
+                    <AlertTriangle
+                        size={18}
                         style={{ color: variantColors[variant] }}
                     />
                     {title}

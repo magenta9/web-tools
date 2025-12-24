@@ -1,15 +1,14 @@
 'use client'
 
-import React, { useState, useEffect, useCallback, useRef } from 'react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import {
-    faHistory,
-    faTrashAlt,
-    faTimes,
-    faInbox,
-    faUpload,
-    faTrash
-} from '@fortawesome/free-solid-svg-icons'
+  History,
+  Trash2,
+  X,
+  Inbox,
+  Upload,
+  Trash
+} from 'lucide-react'
 import { formatTimestamp } from '../utils/format'
 import { BaseHistoryItem } from '../hooks/useHistory'
 import { ConfirmDialog } from './ui/ConfirmDialog'
@@ -27,6 +26,28 @@ export interface HistoryPanelProps<T extends BaseHistoryItem> {
     renderItemLabel: (item: T) => string
     renderItemPreview: (item: T) => React.ReactNode
     renderItemActions?: (item: T, index: number) => React.ReactNode
+}
+
+const historyLabelStyle = {
+  padding: '2px 8px',
+  borderRadius: '4px',
+  fontSize: '12px',
+  fontFamily: 'Orbitron, monospace',
+  background: 'rgba(0, 255, 255, 0.1)',
+  color: 'var(--accent-color)',
+  border: '1px solid var(--border-color)'
+} as const
+
+const previewStyle = {
+  fontFamily: 'JetBrains Mono, monospace',
+  fontSize: '12px',
+  color: 'var(--text-primary)',
+  background: 'var(--bg-secondary)',
+  padding: '8px',
+  borderRadius: '4px',
+  maxHeight: '80px',
+  overflowY: 'auto' as const,
+  wordBreak: 'break-all' as const
 }
 
 export function HistoryPanel<T extends BaseHistoryItem>({
@@ -101,7 +122,7 @@ export function HistoryPanel<T extends BaseHistoryItem>({
             <div className="history-content">
                 <div className="history-header">
                     <h2 className="history-title">
-                        <FontAwesomeIcon icon={faHistory} /> {title}
+                        <History size={18} /> {title}
                     </h2>
                     <div>
                         <button
@@ -109,31 +130,23 @@ export function HistoryPanel<T extends BaseHistoryItem>({
                             onClick={handleClearAll}
                             style={{ marginRight: '10px' }}
                         >
-                            <FontAwesomeIcon icon={faTrashAlt} /> 清空所有
+                            <Trash2 size={14} /> 清空所有
                         </button>
                         <button
                             className="cyber-btn-small"
                             onClick={onClose}
                         >
-                            <FontAwesomeIcon icon={faTimes} /> 关闭
+                            <X size={14} /> 关闭
                         </button>
                     </div>
                 </div>
                 <div className="history-list">
                     {history.length > 0 ? (
                         history.map((item, index) => (
-                            <div key={index} className="history-item">
+                            <div key={`${item.type}-${item.timestamp}`} className="history-item">
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '10px' }}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                        <span style={{
-                                            padding: '2px 8px',
-                                            borderRadius: '4px',
-                                            fontSize: '12px',
-                                            fontFamily: 'Orbitron, monospace',
-                                            background: 'rgba(0, 255, 255, 0.1)',
-                                            color: 'var(--accent-color)',
-                                            border: '1px solid var(--border-color)'
-                                        }}>
+                                        <span style={historyLabelStyle}>
                                             {renderItemLabel(item)}
                                         </span>
                                         <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
@@ -145,22 +158,12 @@ export function HistoryPanel<T extends BaseHistoryItem>({
                                         className="panel-btn"
                                         style={{ color: 'var(--accent-color)', borderColor: 'var(--accent-color)' }}
                                     >
-                                        <FontAwesomeIcon icon={faTrash} />
+                                        <Trash size={14} />
                                     </button>
                                 </div>
                                 <div style={{ marginBottom: '10px' }}>
                                     <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '5px' }}>输入:</div>
-                                    <div style={{
-                                        fontFamily: 'JetBrains Mono, monospace',
-                                        fontSize: '12px',
-                                        color: 'var(--text-primary)',
-                                        background: 'var(--bg-secondary)',
-                                        padding: '8px',
-                                        borderRadius: '4px',
-                                        maxHeight: '80px',
-                                        overflowY: 'auto',
-                                        wordBreak: 'break-all'
-                                    }}>
+                                    <div style={previewStyle}>
                                         {renderItemPreview(item)}
                                     </div>
                                 </div>
@@ -169,7 +172,7 @@ export function HistoryPanel<T extends BaseHistoryItem>({
                                         onClick={() => handleLoad(item)}
                                         className="cyber-btn-small"
                                     >
-                                        <FontAwesomeIcon icon={faUpload} /> 加载
+                                        <Upload size={14} /> 加载
                                     </button>
                                     {renderItemActions && renderItemActions(item, index)}
                                 </div>
@@ -177,7 +180,7 @@ export function HistoryPanel<T extends BaseHistoryItem>({
                         ))
                     ) : (
                         <div className="empty-state">
-                            <FontAwesomeIcon icon={faInbox} />
+                            <Inbox size={32} />
                             <p>暂无历史记录</p>
                         </div>
                     )}

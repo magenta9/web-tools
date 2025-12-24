@@ -1,25 +1,22 @@
 'use client'
 
-import React, { useState, useEffect, useCallback } from 'react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
 import {
-  faArrowRight,
-  faIndent,
-  faCompressArrowsAlt,
-  faQuoteRight,
-  faQuoteLeft,
-  faMagic,
-  faCopy,
-  faPaste,
-  faExchangeAlt,
-  faSortAmountDown,
-  faHistory,
-  faTrashAlt,
-  faTachometerAlt,
-  faCode,
-  faCheckCircle,
-  faExclamationTriangle
-} from '@fortawesome/free-solid-svg-icons'
+  ArrowRight,
+  Minimize2,
+  Quote,
+  Wand2,
+  Copy,
+  Clipboard,
+  ArrowLeftRight,
+  ArrowDownAZ,
+  History,
+  Trash2,
+  Gauge,
+  Code,
+  CircleCheck,
+  AlertTriangle
+} from 'lucide-react'
 import Layout from '../components/Layout'
 import { HistoryPanel } from '../components/HistoryPanel'
 import { useHistory } from '../hooks/useHistory'
@@ -76,7 +73,7 @@ export default function JsonTool() {
   const [error, setError] = useState('')
   const [stats, setStats] = useState({ input: 0, output: 0 })
 
-  const liveTimeoutRef = React.useRef<NodeJS.Timeout | null>(null)
+  const liveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   const addToHistory = useCallback((mode: string, inputText: string, outputText: string) => {
     saveToHistory({
@@ -87,14 +84,16 @@ export default function JsonTool() {
     })
   }, [saveToHistory])
 
-  const updateStats = useCallback(() => {
+  // Separate stats update without useCallback to avoid dependency cycles
+  useEffect(() => {
     setStats({
       input: input.length,
       output: output.length
     })
   }, [input, output])
 
-  const validateJSON = useCallback(() => {
+  // Validate JSON - only depends on input
+  useEffect(() => {
     const trimmed = input.trim()
     if (!trimmed) {
       setValidationStatus('empty')
@@ -111,6 +110,59 @@ export default function JsonTool() {
       setError((e as Error).message)
     }
   }, [input])
+
+  // Live mode processing with debounce
+  useEffect(() => {
+    if (!liveMode || !input) {
+      if (liveTimeoutRef.current) {
+        clearTimeout(liveTimeoutRef.current)
+        liveTimeoutRef.current = null
+      }
+      return
+    }
+
+    if (liveTimeoutRef.current) {
+      clearTimeout(liveTimeoutRef.current)
+    }
+
+    liveTimeoutRef.current = setTimeout(() => {
+      // Process JSON inline for live mode
+      try {
+        const raw = input.trim()
+        if (!raw) return
+
+        let obj: JsonValue
+        try {
+          obj = JSON.parse(raw) as JsonValue
+        } catch (e) {
+          return
+        }
+
+        if (sortKeys) {
+          obj = sortObjectKeys(obj)
+        }
+        const result = JSON.stringify(obj, null, indent)
+        setOutput(result)
+      } catch {
+        // Silent error handling in live mode
+      }
+    }, DEBOUNCE_DELAY.LIVE_MODE)
+
+    return () => {
+      if (liveTimeoutRef.current) {
+        clearTimeout(liveTimeoutRef.current)
+      }
+    }
+  }, [input, liveMode, indent, sortKeys])
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (liveTimeoutRef.current) {
+        clearTimeout(liveTimeoutRef.current)
+      }
+    }
+  }, [])
 
   const processJSON = useCallback((mode: string, silent = false) => {
     const raw = input.trim()
@@ -240,27 +292,6 @@ export default function JsonTool() {
     hideHistory()
   }
 
-  useEffect(() => {
-    updateStats()
-  }, [updateStats])
-
-  useEffect(() => {
-    updateStats()
-    if (liveMode && input) {
-      if (liveTimeoutRef.current) {
-        clearTimeout(liveTimeoutRef.current)
-      }
-      liveTimeoutRef.current = setTimeout(() => {
-        processJSON('format', true)
-      }, 500)
-    }
-    validateJSON()
-  }, [input, liveMode, processJSON, updateStats, validateJSON])
-
-  useEffect(() => {
-    updateStats()
-  }, [output, updateStats])
-
   return (
     <Layout>
       <div className="json-tool">
@@ -274,7 +305,7 @@ export default function JsonTool() {
                   checked={sortKeys}
                   onChange={(e) => setSortKeys(e.target.checked)}
                 />
-                <FontAwesomeIcon icon={faSortAmountDown} /> 排序键
+                <ArrowDownAZ size={14} /> 排序键
               </label>
               <label className="option-label">
                 <input
@@ -282,7 +313,7 @@ export default function JsonTool() {
                   checked={liveMode}
                   onChange={(e) => setLiveMode(e.target.checked)}
                 />
-                <FontAwesomeIcon icon={faTachometerAlt} /> 实时模式
+                <Gauge size={14} /> 实时模式
               </label>
             </div>
             <div className="option-group">
@@ -307,29 +338,29 @@ export default function JsonTool() {
             <div className="panel">
               <div className="panel-header">
                 <div className="panel-title">
-                  <FontAwesomeIcon icon={faArrowRight} /> INPUT
+                  <ArrowRight size={14} /> INPUT
                   {validationStatus !== 'empty' && (
                     <span className={`validation-indicator ${validationStatus}`}>
-                      <FontAwesomeIcon icon={validationStatus === 'valid' ? faCheckCircle : faExclamationTriangle} />
+                      {validationStatus === 'valid' ? <CircleCheck size={12} /> : <AlertTriangle size={12} />}
                       {validationStatus === 'valid' ? '有效' : '无效'}
                     </span>
                   )}
                 </div>
                 <div className="panel-actions">
                   <button className="panel-btn format-btn" onClick={() => processJSON('format')}>
-                    <FontAwesomeIcon icon={faIndent} /> FORMAT
+                    <ArrowRight size={14} /> FORMAT
                   </button>
                   <button className="panel-btn minify-btn" onClick={() => processJSON('minify')}>
-                    <FontAwesomeIcon icon={faCompressArrowsAlt} /> MINIFY
+                    <Minimize2 size={14} /> MINIFY
                   </button>
                   <button className="panel-btn escape-btn" onClick={() => processJSON('escape')}>
-                    <FontAwesomeIcon icon={faQuoteRight} /> ESCAPE
+                    <Quote size={14} /> ESCAPE
                   </button>
                   <button className="panel-btn unescape-btn" onClick={() => processJSON('unescape')}>
-                    <FontAwesomeIcon icon={faQuoteLeft} /> UNESCAPE
+                    <Quote size={14} /> UNESCAPE
                   </button>
                   <button className="panel-btn fix-btn" onClick={fixJSON}>
-                    <FontAwesomeIcon icon={faMagic} /> FIX
+                    <Wand2 size={14} /> FIX
                   </button>
                 </div>
               </div>
@@ -346,15 +377,15 @@ export default function JsonTool() {
                 <div className="stats">
                   <span>{formatBytes(stats.input)} bytes</span>
                   <button className="panel-btn" onClick={showHistory}>
-                    <FontAwesomeIcon icon={faHistory} /> 历史记录
+                    <History size={14} /> 历史记录
                   </button>
                 </div>
                 <div className="action-buttons">
                   <button className="panel-btn" onClick={handlePaste}>
-                    <FontAwesomeIcon icon={faPaste} /> 粘贴
+                    <Clipboard size={14} /> 粘贴
                   </button>
                   <button className="panel-btn" onClick={clearAll}>
-                    <FontAwesomeIcon icon={faTrashAlt} /> 清空
+                    <Trash2 size={14} /> 清空
                   </button>
                 </div>
               </div>
@@ -364,14 +395,14 @@ export default function JsonTool() {
             <div className="panel">
               <div className="panel-header">
                 <div className="panel-title">
-                  <FontAwesomeIcon icon={faCode} /> OUTPUT
+                  <Code size={14} /> OUTPUT
                 </div>
                 <div className="panel-actions">
                   <button className="panel-btn" onClick={swapInOut}>
-                    <FontAwesomeIcon icon={faExchangeAlt} /> 交换
+                    <ArrowLeftRight size={14} /> 交换
                   </button>
                   <button className="panel-btn" onClick={() => output && handleCopy(output)}>
-                    <FontAwesomeIcon icon={faCopy} /> 复制
+                    <Copy size={14} /> 复制
                   </button>
                 </div>
               </div>
@@ -389,7 +420,7 @@ export default function JsonTool() {
                 </div>
                 <div className="action-buttons">
                   <button className="panel-btn" onClick={() => output && handleCopy(output)}>
-                    <FontAwesomeIcon icon={faCopy} /> 复制
+                    <Copy size={14} /> 复制
                   </button>
                 </div>
               </div>

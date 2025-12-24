@@ -1,16 +1,15 @@
 'use client'
 
 import React, { useState } from 'react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
-  faClock,
-  faCalendarAlt,
-  faCopy,
-  faPaste,
-  faTrash,
-  faHistory,
-  faExchangeAlt
-} from '@fortawesome/free-solid-svg-icons'
+  Clock,
+  Calendar,
+  Copy,
+  Clipboard,
+  Trash,
+  History,
+  ArrowLeftRight
+} from 'lucide-react'
 import Layout from '../components/Layout'
 import { HistoryPanel } from '../components/HistoryPanel'
 import { useHistory } from '../hooks/useHistory'
@@ -206,17 +205,17 @@ export default function TimestampConverter() {
             <div className="panel">
               <div className="panel-header">
                 <div className="panel-title">
-                  <FontAwesomeIcon icon={faClock} /> 时间戳转换
+                  <Clock size={14} /> 时间戳转换
                 </div>
                 <div className="panel-actions">
                   <button className="panel-btn" onClick={getCurrentTimestamp}>
                     当前时间戳
                   </button>
                   <button className="panel-btn" onClick={() => handlePaste('timestamp')}>
-                    <FontAwesomeIcon icon={faPaste} /> 粘贴
+                    <Clipboard size={14} /> 粘贴
                   </button>
                   <button className="panel-btn" onClick={() => setTimestamp('')}>
-                    <FontAwesomeIcon icon={faTrash} /> 清空
+                    <Trash size={14} /> 清空
                   </button>
                 </div>
               </div>
@@ -229,7 +228,7 @@ export default function TimestampConverter() {
                   style={{ width: '100%', marginBottom: '10px' }}
                 />
                 <button className="cyber-btn-small" onClick={convertTimestampToDate}>
-                  <FontAwesomeIcon icon={faCalendarAlt} /> 转换为日期
+                  <Calendar size={14} /> 转换为日期
                 </button>
               </div>
             </div>
@@ -238,17 +237,17 @@ export default function TimestampConverter() {
             <div className="panel">
               <div className="panel-header">
                 <div className="panel-title">
-                  <FontAwesomeIcon icon={faCalendarAlt} /> 日期转换
+                  <Calendar size={14} /> 日期转换
                 </div>
                 <div className="panel-actions">
                   <button className="panel-btn" onClick={getCurrentDate}>
                     当前日期
                   </button>
                   <button className="panel-btn" onClick={() => handlePaste('date')}>
-                    <FontAwesomeIcon icon={faPaste} /> 粘贴
+                    <Clipboard size={14} /> 粘贴
                   </button>
                   <button className="panel-btn" onClick={() => setDate('')}>
-                    <FontAwesomeIcon icon={faTrash} /> 清空
+                    <Trash size={14} /> 清空
                   </button>
                 </div>
               </div>
@@ -261,7 +260,7 @@ export default function TimestampConverter() {
                   style={{ width: '100%', marginBottom: '10px' }}
                 />
                 <button className="cyber-btn-small" onClick={convertDateToTimestamp}>
-                  <FontAwesomeIcon icon={faClock} /> 转换为时间戳
+                  <Clock size={14} /> 转换为时间戳
                 </button>
               </div>
             </div>
@@ -276,10 +275,10 @@ export default function TimestampConverter() {
                 </div>
                 <div className="panel-actions">
                   <button className="panel-btn" onClick={swapInputOutput}>
-                    <FontAwesomeIcon icon={faExchangeAlt} /> 交换输入输出
+                    <ArrowLeftRight size={14} /> 交换输入输出
                   </button>
                   <button className="panel-btn" onClick={clearAll}>
-                    <FontAwesomeIcon icon={faTrash} /> 清空全部
+                    <Trash size={14} /> 清空全部
                   </button>
                 </div>
               </div>
@@ -294,7 +293,7 @@ export default function TimestampConverter() {
                         onClick={() => handleCopy(result.value.toString())}
                         style={{ marginTop: '8px' }}
                       >
-                        <FontAwesomeIcon icon={faCopy} /> 复制
+                        <Copy size={14} /> 复制
                       </button>
                     </div>
                   ))}
@@ -309,7 +308,7 @@ export default function TimestampConverter() {
               className="panel-btn"
               onClick={showHistory}
             >
-              <FontAwesomeIcon icon={faHistory} /> 历史记录
+              <History size={14} /> 历史记录
             </button>
           </div>
         </div>

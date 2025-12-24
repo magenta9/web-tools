@@ -1,19 +1,18 @@
 'use client'
 
 import React, { useState } from 'react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
-  faMinusCircle,
-  faPaste,
-  faCode,
-  faTrash,
-  faCodeCompare,
-  faFileCode,
-  faMinus,
-  faPlus,
-  faCopy,
-  faDownload
-} from '@fortawesome/free-solid-svg-icons'
+  MinusCircle,
+  Clipboard,
+  Code,
+  Trash,
+  GitCompare,
+  FileCode,
+  Minus,
+  Plus,
+  Copy,
+  Download
+} from 'lucide-react'
 import Layout from '../components/Layout'
 import { useToastContext } from '../providers/ToastProvider'
 import { useI18n } from '../providers/I18nProvider'
@@ -198,17 +197,17 @@ export default function JsonDiff() {
             <div className="panel">
               <div className="panel-header">
                 <div className="panel-title">
-                  <FontAwesomeIcon icon={faFileCode} /> 原始 JSON
+                  <FileCode size={14} /> 原始 JSON
                 </div>
                 <div className="panel-actions">
                   <button className="panel-btn" onClick={pasteOldJSON}>
-                    <FontAwesomeIcon icon={faPaste} /> 粘贴
+                    <Clipboard size={14} /> 粘贴
                   </button>
                   <button className="panel-btn" onClick={loadOldExample}>
-                    <FontAwesomeIcon icon={faCode} /> 示例
+                    <Code size={14} /> 示例
                   </button>
                   <button className="panel-btn" onClick={clearOldJSON}>
-                    <FontAwesomeIcon icon={faTrash} /> 清空
+                    <Trash size={14} /> 清空
                   </button>
                 </div>
               </div>
@@ -226,17 +225,17 @@ export default function JsonDiff() {
             <div className="panel">
               <div className="panel-header">
                 <div className="panel-title">
-                  <FontAwesomeIcon icon={faFileCode} /> 新的 JSON
+                  <FileCode size={14} /> 新的 JSON
                 </div>
                 <div className="panel-actions">
                   <button className="panel-btn" onClick={pasteNewJSON}>
-                    <FontAwesomeIcon icon={faPaste} /> 粘贴
+                    <Clipboard size={14} /> 粘贴
                   </button>
                   <button className="panel-btn" onClick={loadNewExample}>
-                    <FontAwesomeIcon icon={faCode} /> 示例
+                    <Code size={14} /> 示例
                   </button>
                   <button className="panel-btn" onClick={clearNewJSON}>
-                    <FontAwesomeIcon icon={faTrash} /> 清空
+                    <Trash size={14} /> 清空
                   </button>
                 </div>
               </div>
@@ -254,7 +253,7 @@ export default function JsonDiff() {
           {/* Compare Button */}
           <div style={{ textAlign: 'center', margin: '20px 0' }}>
             <button className="cyber-btn-small" onClick={compareJSON}>
-              <FontAwesomeIcon icon={faCodeCompare} /> 对比 JSON
+              <GitCompare size={14} /> 对比 JSON
             </button>
           </div>
 
@@ -263,22 +262,22 @@ export default function JsonDiff() {
             <div className="panel">
               <div className="panel-header">
                 <div className="panel-title">
-                  <FontAwesomeIcon icon={faMinusCircle} /> 对比结果
+                  <MinusCircle size={14} /> 对比结果
                   <span style={{ marginLeft: '20px', fontSize: '14px' }}>
                     <span style={{ color: '#22c55e' }}>
-                      <FontAwesomeIcon icon={faPlus} /> 新增: {stats.added}
+                      <Plus size={12} /> 新增: {stats.added}
                     </span>
                     <span style={{ marginLeft: '10px', color: '#ef4444' }}>
-                      <FontAwesomeIcon icon={faMinus} /> 删除: {stats.removed}
+                      <Minus size={12} /> 删除: {stats.removed}
                     </span>
                   </span>
                 </div>
                 <div className="panel-actions">
                   <button className="panel-btn" onClick={copyDiff}>
-                    <FontAwesomeIcon icon={faCopy} /> 复制
+                    <Copy size={14} /> 复制
                   </button>
                   <button className="panel-btn" onClick={downloadDiff}>
-                    <FontAwesomeIcon icon={faDownload} /> 下载
+                    <Download size={14} /> 下载
                   </button>
                 </div>
               </div>
@@ -295,24 +294,24 @@ export default function JsonDiff() {
                     if (line.type === 'added') {
                       return (
                         <div key={index} className="diff-item diff-added">
-                          <FontAwesomeIcon icon={faPlus} /> {line.key}: {line.newValue}
+                          <Plus size={12} /> {line.key}: {line.newValue}
                         </div>
                       )
                     }
                     if (line.type === 'removed') {
                       return (
                         <div key={index} className="diff-item diff-removed">
-                          <FontAwesomeIcon icon={faMinus} /> {line.key}: {line.oldValue}
+                          <Minus size={12} /> {line.key}: {line.oldValue}
                         </div>
                       )
                     }
                     return (
                       <div key={index} className="diff-item diff-modified">
                         <div className="diff-removed">
-                          <FontAwesomeIcon icon={faMinus} /> {line.key}: {line.oldValue}
+                          <Minus size={12} /> {line.key}: {line.oldValue}
                         </div>
                         <div className="diff-added">
-                          <FontAwesomeIcon icon={faPlus} /> {line.key}: {line.newValue}
+                          <Plus size={12} /> {line.key}: {line.newValue}
                         </div>
                       </div>
                     )

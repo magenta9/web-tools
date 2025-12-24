@@ -1,17 +1,16 @@
 'use client'
 
 import React, { useState } from 'react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
-  faKey,
-  faLock,
-  faUnlock,
-  faCopy,
-  faPaste,
-  faHistory,
-  faEye,
-  faEyeSlash
-} from '@fortawesome/free-solid-svg-icons'
+  Key,
+  Lock,
+  Unlock,
+  Copy,
+  Clipboard,
+  History,
+  Eye,
+  EyeOff
+} from 'lucide-react'
 import { SignJWT } from 'jose'
 import Layout from '../components/Layout'
 import { HistoryPanel } from '../components/HistoryPanel'
@@ -181,12 +180,12 @@ export default function JwtTool() {
               <button
                 className={`tab-btn active`}
               >
-                <FontAwesomeIcon icon={faUnlock} /> JWT DECODER
+                <Unlock size={14} /> JWT DECODER
               </button>
               <button
                 className={`tab-btn`}
               >
-                <FontAwesomeIcon icon={faLock} /> JWT ENCODER
+                <Lock size={14} /> JWT ENCODER
               </button>
             </div>
 
@@ -208,10 +207,10 @@ export default function JwtTool() {
                       />
                       <div style={{ marginTop: '10px', display: 'flex', gap: '10px' }}>
                         <button className="panel-btn" onClick={() => handlePaste('jwt')}>
-                          <FontAwesomeIcon icon={faPaste} /> 粘贴
+                          <Clipboard size={14} /> 粘贴
                         </button>
                         <button className="cyber-btn-small" onClick={decodeJWT}>
-                          <FontAwesomeIcon icon={faUnlock} /> 解码
+                          <Unlock size={14} /> 解码
                         </button>
                       </div>
                     </div>
@@ -228,7 +227,7 @@ export default function JwtTool() {
                             onClick={() => handleCopy(header)}
                             style={{ float: 'right' }}
                           >
-                            <FontAwesomeIcon icon={faCopy} /> 复制
+                            <Copy size={14} /> 复制
                           </button>
                         </div>
                         <div className="jwt-section-content">
@@ -244,7 +243,7 @@ export default function JwtTool() {
                             onClick={() => handleCopy(payload)}
                             style={{ float: 'right' }}
                           >
-                            <FontAwesomeIcon icon={faCopy} /> 复制
+                            <Copy size={14} /> 复制
                           </button>
                         </div>
                         <div className="jwt-section-content">
@@ -271,7 +270,7 @@ export default function JwtTool() {
                 {/* Encode Section */}
                 <div className="jwt-sections" style={{ marginTop: '30px' }}>
                   <h3 style={{ marginBottom: '20px' }}>
-                    <FontAwesomeIcon icon={faLock} /> JWT ENCODER
+                    <Lock size={16} /> JWT ENCODER
                   </h3>
 
                   {/* Secret Key */}
@@ -283,7 +282,7 @@ export default function JwtTool() {
                         onClick={() => setShowSecret(!showSecret)}
                         style={{ float: 'right' }}
                       >
-                        <FontAwesomeIcon icon={showSecret ? faEyeSlash : faEye} />
+                        {showSecret ? <EyeOff size={14} /> : <Eye size={14} />}
                         {showSecret ? '隐藏' : '显示'}
                       </button>
                     </div>
@@ -308,7 +307,7 @@ export default function JwtTool() {
                             className="panel-btn"
                             onClick={() => handlePaste('header')}
                           >
-                            <FontAwesomeIcon icon={faPaste} />
+                            <Clipboard size={14} />
                           </button>
                           <button
                             className="panel-btn"
@@ -338,7 +337,7 @@ export default function JwtTool() {
                           onClick={() => handlePaste('payload')}
                           style={{ float: 'right' }}
                         >
-                          <FontAwesomeIcon icon={faPaste} />
+                          <Clipboard size={14} />
                         </button>
                       </div>
                       <div className="jwt-section-content">
@@ -354,7 +353,7 @@ export default function JwtTool() {
                   </div>
 
                   <button className="cyber-btn-small" onClick={encodeJWT} style={{ marginTop: '20px' }}>
-                    <FontAwesomeIcon icon={faLock} /> 生成 JWT
+                    <Lock size={14} /> 生成 JWT
                   </button>
 
                   {encodedJwt && (
@@ -366,7 +365,7 @@ export default function JwtTool() {
                           onClick={() => handleCopy(encodedJwt)}
                           style={{ float: 'right' }}
                         >
-                          <FontAwesomeIcon icon={faCopy} /> 复制
+                          <Copy size={14} /> 复制
                         </button>
                       </div>
                       <div className="jwt-section-content">
@@ -387,7 +386,7 @@ export default function JwtTool() {
               className="panel-btn"
               onClick={showHistory}
             >
-              <FontAwesomeIcon icon={faHistory} /> 历史记录
+              <History size={14} /> 历史记录
             </button>
           </div>
         </div>

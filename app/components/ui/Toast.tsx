@@ -1,14 +1,13 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
-    faCheckCircle,
-    faExclamationCircle,
-    faInfoCircle,
-    faExclamationTriangle,
-    faTimes
-} from '@fortawesome/free-solid-svg-icons'
+    CheckCircle,
+    AlertCircle,
+    Info,
+    AlertTriangle,
+    X
+} from 'lucide-react'
 import type { ToastType, ToastMessage } from '@/types'
 import { TOAST_DURATION } from '@/constants'
 
@@ -17,15 +16,16 @@ interface ToastItemProps {
     onRemove: (id: string) => void
 }
 
-const iconMap = {
-    success: faCheckCircle,
-    error: faExclamationCircle,
-    info: faInfoCircle,
-    warning: faExclamationTriangle,
+const iconMap: Record<ToastType, React.ElementType> = {
+    success: CheckCircle,
+    error: AlertCircle,
+    info: Info,
+    warning: AlertTriangle,
 }
 
 function ToastItem({ toast, onRemove }: ToastItemProps) {
     const [isExiting, setIsExiting] = useState(false)
+    const Icon = iconMap[toast.type]
 
     useEffect(() => {
         const duration = toast.duration ?? TOAST_DURATION.NORMAL
@@ -48,14 +48,14 @@ function ToastItem({ toast, onRemove }: ToastItemProps) {
             role="alert"
             aria-live="polite"
         >
-            <FontAwesomeIcon icon={iconMap[toast.type]} className="toast-icon" />
+            <Icon size={18} className="toast-icon" />
             <span className="toast-message">{toast.message}</span>
             <button
                 className="toast-close"
                 onClick={handleClose}
                 aria-label="Close notification"
             >
-                <FontAwesomeIcon icon={faTimes} />
+                <X size={14} />
             </button>
         </div>
     )

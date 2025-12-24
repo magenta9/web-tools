@@ -1,19 +1,18 @@
 'use client'
 
 import React, { useState } from 'react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
-  faKey,
-  faLink,
-  faSync,
-  faSearch,
-  faCopy,
-  faPaste,
-  faCode,
-  faCheck,
-  faArrowUp,
-  faHistory
-} from '@fortawesome/free-solid-svg-icons'
+  Key,
+  Link,
+  RefreshCw,
+  Search,
+  Copy,
+  Clipboard,
+  Code,
+  Check,
+  ArrowUp,
+  History
+} from 'lucide-react'
 import Layout from '../components/Layout'
 import { HistoryPanel } from '../components/HistoryPanel'
 import { useHistory } from '../hooks/useHistory'
@@ -31,6 +30,17 @@ interface ImageHistoryItem {
   output: string
   timestamp: number
 }
+
+const iconMap: Record<string, React.ComponentType<{ size?: number }>> = {
+  globe: Globe,
+  flag: Flag,
+  compress: Package,
+  'expand-arrows-alt': Expand,
+  tv: Monitor
+}
+
+// Import additional icons
+import { Globe, Flag, Package, Expand, Monitor } from 'lucide-react'
 
 export default function ImageConverter() {
   const [activeTab, setActiveTab] = useState<ImageTab>('key-to-url')
@@ -180,6 +190,10 @@ export default function ImageConverter() {
     }
   }
 
+  const getIconComponent = (iconName: string) => {
+    return iconMap[iconName] || Globe
+  }
+
   return (
     <Layout>
       <div className="image-converter">
@@ -189,13 +203,13 @@ export default function ImageConverter() {
               className={`tab-btn ${activeTab === 'key-to-url' ? 'active' : ''}`}
               onClick={() => setActiveTab('key-to-url')}
             >
-              <FontAwesomeIcon icon={faKey} /> KEY → URLS
+              <Key size={14} /> KEY → URLS
             </button>
             <button
               className={`tab-btn ${activeTab === 'url-to-key' ? 'active' : ''}`}
               onClick={() => setActiveTab('url-to-key')}
             >
-              <FontAwesomeIcon icon={faLink} /> URL → KEY
+              <Link size={14} /> URL → KEY
             </button>
           </div>
 
@@ -207,14 +221,14 @@ export default function ImageConverter() {
                   <div className="panel">
                     <div className="panel-header">
                       <div className="panel-title input">
-                        <FontAwesomeIcon icon={faKey} /> INPUT KEY
+                        <Key size={14} /> INPUT KEY
                       </div>
                       <div className="panel-actions">
                         <button className="panel-btn" onClick={() => handlePaste('key')}>
-                          <FontAwesomeIcon icon={faPaste} /> PASTE
+                          <Clipboard size={14} /> PASTE
                         </button>
                         <button className="panel-btn" onClick={() => loadExample('key')}>
-                          <FontAwesomeIcon icon={faCode} /> DEMO
+                          <Code size={14} /> DEMO
                         </button>
                       </div>
                     </div>
@@ -234,11 +248,11 @@ export default function ImageConverter() {
                           onClick={showHistory}
                           style={{ marginLeft: '10px' }}
                         >
-                          <FontAwesomeIcon icon={faHistory} /> 历史记录
+                          <History size={14} /> 历史记录
                         </button>
                       </div>
                       <button className="cyber-btn-small" onClick={convertKeyToUrls}>
-                        <FontAwesomeIcon icon={faSync} /> CONVERT
+                        <RefreshCw size={14} /> CONVERT
                       </button>
                     </div>
                   </div>
@@ -247,44 +261,47 @@ export default function ImageConverter() {
                   <div className="panel">
                     <div className="panel-header">
                       <div className="panel-title output">
-                        <FontAwesomeIcon icon={faCheck} /> OUTPUT URLS
+                        <Check size={14} /> OUTPUT URLS
                       </div>
                       <div className="panel-actions">
                         <button className="panel-btn" onClick={copyAllUrls}>
-                          <FontAwesomeIcon icon={faCopy} /> COPY ALL
+                          <Copy size={14} /> COPY ALL
                         </button>
                       </div>
                     </div>
                     <div className="panel-content">
                       {urlOutput.length > 0 ? (
                         <div className="url-list">
-                          {urlOutput.map((item, index) => (
-                            <div key={index} className="url-item">
-                              <div className="url-item-header">
-                                <FontAwesomeIcon icon={item.icon as any} />
-                                {item.label}
-                              </div>
-                              <div
-                                className="url-item-content"
-                                onClick={(e) => handleUrlClick(item.url, e)}
-                                title="点击复制，Ctrl+点击打开链接"
-                              >
-                                {item.url}
-                              </div>
-                              <div className="url-item-actions">
-                                <button
-                                  className="cyber-btn-small"
-                                  onClick={() => handleCopy(item.url)}
+                          {urlOutput.map((item, index) => {
+                            const IconComponent = getIconComponent(item.icon)
+                            return (
+                              <div key={index} className="url-item">
+                                <div className="url-item-header">
+                                  <IconComponent size={14} />
+                                  {item.label}
+                                </div>
+                                <div
+                                  className="url-item-content"
+                                  onClick={(e) => handleUrlClick(item.url, e)}
+                                  title="点击复制，Ctrl+点击打开链接"
                                 >
-                                  <FontAwesomeIcon icon={faCopy} /> 复制
-                                </button>
+                                  {item.url}
+                                </div>
+                                <div className="url-item-actions">
+                                  <button
+                                    className="cyber-btn-small"
+                                    onClick={() => handleCopy(item.url)}
+                                  >
+                                    <Copy size={14} /> 复制
+                                  </button>
+                                </div>
                               </div>
-                            </div>
-                          ))}
+                            )
+                          })}
                         </div>
                       ) : (
                         <div className="empty-state">
-                          <FontAwesomeIcon icon={faArrowUp} />
+                          <ArrowUp size={32} />
                           <p>Enter Image Key to generate URLs</p>
                         </div>
                       )}
@@ -301,14 +318,14 @@ export default function ImageConverter() {
                   <div className="panel">
                     <div className="panel-header">
                       <div className="panel-title input">
-                        <FontAwesomeIcon icon={faLink} /> INPUT URL
+                        <Link size={14} /> INPUT URL
                       </div>
                       <div className="panel-actions">
                         <button className="panel-btn" onClick={() => handlePaste('url')}>
-                          <FontAwesomeIcon icon={faPaste} /> PASTE
+                          <Clipboard size={14} /> PASTE
                         </button>
                         <button className="panel-btn" onClick={() => loadExample('url')}>
-                          <FontAwesomeIcon icon={faCode} /> DEMO
+                          <Code size={14} /> DEMO
                         </button>
                       </div>
                     </div>
@@ -328,11 +345,11 @@ export default function ImageConverter() {
                           onClick={showHistory}
                           style={{ marginLeft: '10px' }}
                         >
-                          <FontAwesomeIcon icon={faHistory} /> 历史记录
+                          <History size={14} /> 历史记录
                         </button>
                       </div>
                       <button className="cyber-btn-small" onClick={extractKeyFromUrl}>
-                        <FontAwesomeIcon icon={faSearch} /> EXTRACT
+                        <Search size={14} /> EXTRACT
                       </button>
                     </div>
                   </div>
@@ -341,11 +358,11 @@ export default function ImageConverter() {
                   <div className="panel">
                     <div className="panel-header">
                       <div className="panel-title output">
-                        <FontAwesomeIcon icon={faKey} /> OUTPUT KEY
+                        <Key size={14} /> OUTPUT KEY
                       </div>
                       <div className="panel-actions">
                         <button className="panel-btn" onClick={() => keyOutput && handleCopy(keyOutput)}>
-                          <FontAwesomeIcon icon={faCopy} /> COPY
+                          <Copy size={14} /> COPY
                         </button>
                       </div>
                     </div>
@@ -353,7 +370,7 @@ export default function ImageConverter() {
                       {keyOutput ? (
                         <div className="key-output">
                           <div className="key-output-header">
-                            <FontAwesomeIcon icon={faKey} />
+                            <Key size={14} />
                             提取的 Image Key
                           </div>
                           <div className="key-output-content">
@@ -364,13 +381,13 @@ export default function ImageConverter() {
                               className="cyber-btn-small"
                               onClick={() => handleCopy(keyOutput)}
                             >
-                              <FontAwesomeIcon icon={faCopy} /> 复制
+                              <Copy size={14} /> 复制
                             </button>
                           </div>
                         </div>
                       ) : (
                         <div className="empty-state">
-                          <FontAwesomeIcon icon={faArrowUp} />
+                          <ArrowUp size={32} />
                           <p>Enter URL to extract Image Key</p>
                         </div>
                       )}

@@ -2,27 +2,28 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
-  faCode,
-  faImage,
-  faCodeCompare,
-  faClock,
-  faKey,
-  faSun,
-  faMoon
-} from '@fortawesome/free-solid-svg-icons'
+  Code,
+  Image,
+  GitCompare,
+  Clock,
+  Key,
+  Sun,
+  Moon,
+  Database
+} from 'lucide-react'
 import { useTheme } from '../providers/ThemeProvider'
+import { memo } from 'react'
 
 const navItems = [
-  { href: '/json', label: 'JSON', icon: faCode },
-  { href: '/image', label: 'Image', icon: faImage },
-  { href: '/diff', label: 'Diff', icon: faCodeCompare },
-  { href: '/timestamp', label: 'Timestamp', icon: faClock },
-  { href: '/jwt', label: 'JWT', icon: faKey },
+  { href: '/json', label: 'JSON', Icon: Code },
+  { href: '/image', label: 'Image', Icon: Image },
+  { href: '/diff', label: 'Diff', Icon: GitCompare },
+  { href: '/timestamp', label: 'Timestamp', Icon: Clock },
+  { href: '/jwt', label: 'JWT', Icon: Key },
 ]
 
-export default function Header() {
+const Header = memo(function Header() {
   const pathname = usePathname()
   const { isDarkMode, toggleTheme } = useTheme()
 
@@ -32,7 +33,7 @@ export default function Header() {
         <div className="header-content">
           <Link href="/" className="logo">
             <div className="logo-icon">
-              <FontAwesomeIcon icon={faCode} />
+              <Code size={20} />
             </div>
             <div className="logo-text">
               <h1 className="logo-title">Web Tools</h1>
@@ -47,7 +48,7 @@ export default function Header() {
                 href={item.href}
                 className={`nav-link ${pathname === item.href ? 'active' : ''}`}
               >
-                <FontAwesomeIcon icon={item.icon} />
+                <item.Icon size={16} />
                 {item.label}
               </Link>
             ))}
@@ -56,11 +57,13 @@ export default function Header() {
               onClick={toggleTheme}
               title={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
             >
-              <FontAwesomeIcon icon={isDarkMode ? faSun : faMoon} />
+              {isDarkMode ? <Sun size={16} /> : <Moon size={16} />}
             </button>
           </nav>
         </div>
       </div>
     </header>
   )
-}
+})
+
+export default Header

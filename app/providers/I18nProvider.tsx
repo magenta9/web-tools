@@ -1,6 +1,6 @@
 'use client'
 
-import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react'
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback, useMemo } from 'react'
 import { zhCN, enUS, type Locale, type LocaleKey, defaultLocale } from '@/locales'
 import { STORAGE_KEYS } from '@/constants'
 
@@ -38,8 +38,15 @@ export function I18nProvider({ children }: { children: ReactNode }) {
         }
     }, [])
 
+    // Memoize context value to prevent unnecessary re-renders
+    const contextValue = useMemo<I18nContextValue>(() => ({
+        locale,
+        t,
+        setLocale
+    }), [locale, t, setLocale])
+
     return (
-        <I18nContext.Provider value={{ locale, t, setLocale }}>
+        <I18nContext.Provider value={contextValue}>
             {children}
         </I18nContext.Provider>
     )
