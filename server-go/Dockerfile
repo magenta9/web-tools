@@ -10,5 +10,6 @@ FROM alpine:3.19
 WORKDIR /app
 RUN apk --no-cache add ca-certificates
 COPY --from=builder /app/server .
+COPY --from=builder /app/.env .
 EXPOSE 3001
 CMD ["./server"]

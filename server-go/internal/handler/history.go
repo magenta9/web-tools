@@ -56,3 +56,36 @@ func (h *HistoryHandler) Get(c *gin.Context) {
 
 	c.JSON(200, gin.H{"success": true, "history": history})
 }
+
+func (h *HistoryHandler) Delete(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil || id <= 0 {
+		c.JSON(400, gin.H{"success": false, "error": "invalid id"})
+		return
+	}
+
+	err = h.repo.DeleteHistory(c.Request.Context(), id)
+	if err != nil {
+		c.JSON(500, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+
+	c.JSON(200, gin.H{"success": true})
+}
+
+func (h *HistoryHandler) Clear(c *gin.Context) {
+	toolName := c.Query("tool_name")
+	if toolName == "" {
+		c.JSON(400, gin.H{"success": false, "error": "tool_name is required"})
+		return
+	}
+
+	err := h.repo.ClearHistory(c.Request.Context(), toolName)
+	if err != nil {
+		c.JSON(500, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+
+	c.JSON(200, gin.H{"success": true})
+}

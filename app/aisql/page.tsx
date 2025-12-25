@@ -123,7 +123,7 @@ export default function AiSqlTool() {
     clearAllHistory,
     showHistory,
     hideHistory
-  } = useHistory<AiSqlHistoryItem>({ storageKey: STORAGE_KEYS.AISQL_HISTORY })
+  } = useHistory<AiSqlHistoryItem>({ storageKey: STORAGE_KEYS.AISQL_HISTORY, toolName: 'aisql' })
 
   // Load saved config
   useEffect(() => {
@@ -356,13 +356,13 @@ export default function AiSqlTool() {
           if (data.hasTabs) {
             // Tab-separated format (multiple columns)
             const headers = data.header.split('\t')
-            const rows = data.rows.map(row => row.split('\t'))
+            const rows = data.rows.map((row: string) => row.split('\t'))
             setQueryHeaders(headers)
             setQueryRows(rows)
           } else {
             // Single column format (like SHOW TABLES)
             setQueryHeaders([data.header])
-            setQueryRows(data.rows.map(row => [row]))
+            setQueryRows(data.rows.map((row: string) => [row]))
           }
         } else {
           setQueryHeaders([])

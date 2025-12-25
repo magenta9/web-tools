@@ -58,7 +58,7 @@ export default function ImageConverter() {
     clearAllHistory,
     showHistory,
     hideHistory
-  } = useHistory<ImageHistoryItem>({ storageKey: STORAGE_KEYS.IMAGE_HISTORY })
+  } = useHistory<ImageHistoryItem>({ storageKey: STORAGE_KEYS.IMAGE_HISTORY, toolName: 'image' })
 
   const addToHistory = (type: ImageHistoryItem['type'], input: string, output: string) => {
     saveToHistory({ type, input, output })

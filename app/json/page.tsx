@@ -69,7 +69,7 @@ export default function JsonTool() {
     clearAllHistory,
     showHistory,
     hideHistory
-  } = useHistory<JsonHistoryItem>({ storageKey: STORAGE_KEYS.JSON_HISTORY })
+  } = useHistory<JsonHistoryItem>({ storageKey: STORAGE_KEYS.JSON_HISTORY, toolName: 'json' })
   const [validationStatus, setValidationStatus] = useState<ValidationStatus>('empty')
   const [error, setError] = useState('')
   const [stats, setStats] = useState({ input: 0, output: 0 })
@@ -437,7 +437,7 @@ export default function JsonTool() {
           onClearAll={clearAllHistory}
           onDelete={deleteHistoryItem}
           onLoad={loadFromHistory}
-          renderItemLabel={(item) => item.mode.toUpperCase()}
+          renderItemLabel={(item) => (item.mode || item.type || '').toUpperCase()}
           renderItemPreview={(item) => item.input.length > 200 ? item.input.substring(0, 200) + '...' : item.input}
         />
       </div>

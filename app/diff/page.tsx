@@ -11,15 +11,29 @@ import {
   Minus,
   Plus,
   Copy,
-  Download
+  Download,
+  History
 } from 'lucide-react'
 import Layout from '../components/Layout'
+import { HistoryPanel } from '../components/HistoryPanel'
+import { useHistory } from '../hooks/useHistory'
 import { useToastContext } from '../providers/ToastProvider'
 import { useI18n } from '../providers/I18nProvider'
 import { pasteFromClipboard, copyToClipboard } from '../utils'
-import { EXAMPLES } from '@/constants'
+import { EXAMPLES, STORAGE_KEYS } from '@/constants'
 import type { DiffLine, DiffStats, JsonObject } from '@/types'
 import '../tools.css'
+
+interface DiffHistoryItem {
+  type: string
+  input: string
+  output: string
+  timestamp: number
+  data: {
+    oldJson: string
+    newJson: string
+  }
+}
 
 export default function JsonDiff() {
   const [oldJson, setOldJson] = useState('')
@@ -28,6 +42,15 @@ export default function JsonDiff() {
   const [stats, setStats] = useState<DiffStats>({ added: 0, removed: 0 })
   const toast = useToastContext()
   const { t } = useI18n()
+  const {
+    history,
+    historyVisible,
+    saveToHistory,
+    deleteHistoryItem,
+    clearAllHistory,
+    showHistory,
+    hideHistory
+  } = useHistory<DiffHistoryItem>({ storageKey: STORAGE_KEYS.DIFF_HISTORY, toolName: 'diff' })
 
   const pasteOldJSON = async () => {
     const text = await pasteFromClipboard()
@@ -85,6 +108,15 @@ export default function JsonDiff() {
 
       setDiffOutput(diff)
       setStats({ added: addedCount, removed: removedCount })
+
+      // Save to history
+      saveToHistory({
+        type: 'json_diff',
+        input: oldJson,
+        output: diffToText(),
+        data: { oldJson, newJson }
+      })
+
       toast.success(t.diff.compareSuccess)
     } catch {
       toast.error(t.diff.formatError)
@@ -188,6 +220,14 @@ export default function JsonDiff() {
     URL.revokeObjectURL(url)
   }
 
+  const loadFromHistory = (item: DiffHistoryItem) => {
+    setOldJson(item.data.oldJson)
+    setNewJson(item.data.newJson)
+    setDiffOutput([])
+    setStats({ added: 0, removed: 0 })
+    hideHistory()
+  }
+
   return (
     <Layout>
       <div className="json-diff">
@@ -252,8 +292,11 @@ export default function JsonDiff() {
 
           {/* Compare Button */}
           <div style={{ textAlign: 'center', margin: '20px 0' }}>
-            <button className="cyber-btn-small" onClick={compareJSON}>
+            <button className="cyber-btn-small" onClick={compareJSON} style={{ marginRight: '10px' }}>
               <GitCompare size={14} /> 对比 JSON
+            </button>
+            <button className="panel-btn" onClick={showHistory}>
+              <History size={14} /> 历史记录
             </button>
           </div>
 
@@ -322,6 +365,18 @@ export default function JsonDiff() {
           )}
         </div>
       </div>
+
+      <HistoryPanel
+        visible={historyVisible}
+        title="JSON 对比历史"
+        history={history}
+        onClose={hideHistory}
+        onClearAll={clearAllHistory}
+        onDelete={deleteHistoryItem}
+        onLoad={loadFromHistory}
+        renderItemLabel={(item) => '对比'}
+        renderItemPreview={(item) => item.data?.oldJson?.substring(0, 100) || ''}
+      />
     </Layout>
   )
 }

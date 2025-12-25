@@ -88,3 +88,13 @@ func (r *Repository) SetConfig(ctx context.Context, key string, value any) error
 		 ON CONFLICT (key) DO UPDATE SET value = $2, updated_at = NOW()`, key, valueJSON)
 	return err
 }
+
+func (r *Repository) DeleteHistory(ctx context.Context, id int64) error {
+	_, err := r.pool.Exec(ctx, `DELETE FROM tool_history WHERE id = $1`, id)
+	return err
+}
+
+func (r *Repository) ClearHistory(ctx context.Context, toolName string) error {
+	_, err := r.pool.Exec(ctx, `DELETE FROM tool_history WHERE tool_name = $1`, toolName)
+	return err
+}

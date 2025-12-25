@@ -42,7 +42,7 @@ export default function TimestampConverter() {
     clearAllHistory,
     showHistory,
     hideHistory
-  } = useHistory<TimestampHistoryItem>({ storageKey: STORAGE_KEYS.TIMESTAMP_HISTORY })
+  } = useHistory<TimestampHistoryItem>({ storageKey: STORAGE_KEYS.TIMESTAMP_HISTORY, toolName: 'timestamp' })
 
   const addToHistory = (type: TimestampHistoryItem['type'], input: string, output: string) => {
     saveToHistory({ type, input, output })

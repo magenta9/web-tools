@@ -117,7 +117,7 @@ Write only the SQL query, nothing else. Do not include markdown code blocks.`, r
 	sql = strings.TrimSuffix(sql, "```")
 	sql = strings.TrimSpace(sql)
 
-	c.JSON(200, gin.H{"success": true, "sql": sql})
+	c.JSON(200, gin.H{"success": true, "sql": sql, "response": result})
 }
 
 func (h *OllamaHandler) Chat(c *gin.Context) {

@@ -78,6 +78,8 @@ func main() {
 		if historyH != nil {
 			api.POST("/history", historyH.Save)
 			api.GET("/history", historyH.Get)
+			api.DELETE("/history/:id", historyH.Delete)
+			api.DELETE("/history", historyH.Clear)
 		}
 	}
 

@@ -35,6 +35,9 @@ export const STORAGE_KEYS = {
     JWT_HISTORY: 'jwt_history',
     TIMESTAMP_HISTORY: 'timestamp_history',
     AISQL_HISTORY: 'aisql_history',
+    JSONFIX_HISTORY: 'jsonfix_history',
+    DIFF_HISTORY: 'diff_history',
+    TRANSLATE_HISTORY: 'translate_history',
     THEME: 'theme',
     LOCALE: 'locale',
 } as const

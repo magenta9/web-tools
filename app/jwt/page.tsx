@@ -47,7 +47,7 @@ export default function JwtTool() {
     clearAllHistory,
     showHistory,
     hideHistory
-  } = useHistory<JwtHistoryItem>({ storageKey: STORAGE_KEYS.JWT_HISTORY })
+  } = useHistory<JwtHistoryItem>({ storageKey: STORAGE_KEYS.JWT_HISTORY, toolName: 'jwt' })
 
   const addToHistory = (type: JwtHistoryItem['type'], input: string, output: string) => {
     saveToHistory({ type, input, output })

@@ -2,7 +2,10 @@
 
 import { useState, useEffect } from 'react'
 import Layout from '../components/Layout'
-import { Languages, ArrowRightLeft, Copy, Loader2 } from 'lucide-react'
+import { HistoryPanel } from '../components/HistoryPanel'
+import { useHistory } from '../hooks/useHistory'
+import { Languages, ArrowRightLeft, Copy, Loader2, History } from 'lucide-react'
+import { STORAGE_KEYS } from '@/constants'
 import '../tools.css'
 
 const languages = [
@@ -17,6 +20,19 @@ const translationStyles = [
     { code: 'formal', name: '严谨', description: '正式、专业的用词' }
 ]
 
+interface TranslateHistoryItem {
+    type: string
+    input: string
+    output: string
+    timestamp: number
+    data: {
+        sourceText: string
+        sourceLang: string
+        targetLang: string
+        style: string
+    }
+}
+
 export default function TranslatePage() {
     const [sourceText, setSourceText] = useState('')
     const [translatedText, setTranslatedText] = useState('')
@@ -27,6 +43,16 @@ export default function TranslatePage() {
     const [availableModels, setAvailableModels] = useState<any[]>([])
     const [isTranslating, setIsTranslating] = useState(false)
     const [error, setError] = useState('')
+
+    const {
+        history,
+        historyVisible,
+        saveToHistory,
+        deleteHistoryItem,
+        clearAllHistory,
+        showHistory,
+        hideHistory
+    } = useHistory<TranslateHistoryItem>({ storageKey: STORAGE_KEYS.TRANSLATE_HISTORY, toolName: 'translate' })
 
     // Load available models on component mount
     useEffect(() => {
@@ -86,6 +112,14 @@ export default function TranslatePage() {
 
             if (data.success) {
                 setTranslatedText(data.translation)
+
+                // Save to history
+                saveToHistory({
+                    type: 'translation',
+                    input: sourceText,
+                    output: data.translation,
+                    data: { sourceText, sourceLang, targetLang, style }
+                })
             } else {
                 setError(data.error || '翻译失败')
             }
@@ -117,6 +151,15 @@ export default function TranslatePage() {
 
     const getLanguageFlag = (code: string) => {
         return languages.find(lang => lang.code === code)?.flag || ''
+    }
+
+    const loadFromHistory = (item: TranslateHistoryItem) => {
+        setSourceText(item.data.sourceText)
+        setSourceLang(item.data.sourceLang)
+        setTargetLang(item.data.targetLang)
+        setStyle(item.data.style)
+        setTranslatedText('')
+        hideHistory()
     }
 
     return (
@@ -230,23 +273,28 @@ export default function TranslatePage() {
                         </div>
                         <div className="panel-footer">
                             <span className="char-count">{sourceText.length} 字符</span>
-                            <button
-                                className="action-btn generate-btn"
-                                onClick={handleTranslate}
-                                disabled={!sourceText.trim() || isTranslating || sourceLang === targetLang}
-                            >
-                                {isTranslating ? (
-                                    <>
-                                        <Loader2 size={14} className="spin" />
-                                        <span>翻译中...</span>
-                                    </>
-                                ) : (
-                                    <>
-                                        <Languages size={14} />
-                                        <span>翻译</span>
-                                    </>
-                                )}
-                            </button>
+                            <div style={{ display: 'flex', gap: '8px' }}>
+                                <button
+                                    className="action-btn generate-btn"
+                                    onClick={handleTranslate}
+                                    disabled={!sourceText.trim() || isTranslating || sourceLang === targetLang}
+                                >
+                                    {isTranslating ? (
+                                        <>
+                                            <Loader2 size={14} className="spin" />
+                                            <span>翻译中...</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Languages size={14} />
+                                            <span>翻译</span>
+                                        </>
+                                    )}
+                                </button>
+                                <button className="panel-btn" onClick={showHistory}>
+                                    <History size={14} /> 历史记录
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -288,6 +336,18 @@ export default function TranslatePage() {
                     </div>
                 </div>
             </div>
+
+            <HistoryPanel
+                visible={historyVisible}
+                title="翻译历史"
+                history={history}
+                onClose={hideHistory}
+                onClearAll={clearAllHistory}
+                onDelete={deleteHistoryItem}
+                onLoad={loadFromHistory}
+                renderItemLabel={(item) => `${getLanguageFlag(item.data?.sourceLang || 'zh')} → ${getLanguageFlag(item.data?.targetLang || 'en')}`}
+                renderItemPreview={(item) => item.data?.sourceText?.substring(0, 100) || ''}
+            />
         </Layout>
     )
 }

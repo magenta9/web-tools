@@ -259,7 +259,7 @@ export default function JsonFixTool() {
     clearAllHistory,
     showHistory,
     hideHistory
-  } = useHistory<JsonFixHistoryItem>({ storageKey: STORAGE_KEYS.JSONFIX_HISTORY })
+  } = useHistory<JsonFixHistoryItem>({ storageKey: STORAGE_KEYS.JSONFIX_HISTORY, toolName: 'jsonfix' })
   const [error, setError] = useState('')
   const liveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
@@ -605,7 +605,7 @@ Output (pure JSON only, nothing else):`,
           onClearAll={clearAllHistory}
           onDelete={deleteHistoryItem}
           onLoad={loadFromHistory}
-          renderItemLabel={(item) => item.mode.toUpperCase()}
+          renderItemLabel={(item) => (item.mode || item.type || '').toUpperCase()}
           renderItemPreview={(item) => item.input.length > 200 ? item.input.substring(0, 200) + '...' : item.input}
         />
       </div>
