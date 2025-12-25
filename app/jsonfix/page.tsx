@@ -308,24 +308,33 @@ export default function JsonFixTool() {
   const [liveMode, setLiveMode] = useState(false)
 
   // Load models from Ollama
-  const loadModels = useCallback(async () => {
-    try {
-      const res = await fetch(`${API_BASE}/ollama/models`)
-      const data = await res.json()
-      if (data.success && data.models) {
-        setModels(data.models)
-        if (data.models.length > 0 && !data.models.find((m: OllamaModel) => m.name === selectedModel)) {
-          setSelectedModel(data.models[0].name)
-        }
-      }
-    } catch {
-      // Ollama might not be running
-    }
-  }, [selectedModel])
-
   useEffect(() => {
+    let mounted = true
+
+    const loadModels = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/ollama/models`)
+        const data = await res.json()
+        if (mounted && data.success && data.models) {
+          setModels(data.models)
+          if (data.models.length > 0) {
+            const currentModelAvailable = data.models.some((m: OllamaModel) => m.name === selectedModel)
+            if (!currentModelAvailable) {
+              setSelectedModel(data.models[0].name)
+            }
+          }
+        }
+      } catch {
+        // Ollama might not be running
+      }
+    }
+
     loadModels()
-  }, [loadModels])
+
+    return () => {
+      mounted = false
+    }
+  }, [])
 
   // AI-powered JSON fix
   const fixJsonWithAI = async () => {

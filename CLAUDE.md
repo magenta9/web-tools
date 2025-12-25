@@ -2,16 +2,39 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Plan & Review
+
+### Before starting work
+
+Always in plan mode to make a plan
+After get the plan, make sure you Write the plan to .claude/tasks/TASK_NAME.md.
+The plan should be a detailed implementation plan and the reasoning behind them, as well as tasks broken down.
+plan needs to be written in Chinese
+If the task require external knowledge or certain package, also research to get latest knowledge (Use Task tool for research)
+Don't over plan it, always think MVP.
+Once you write the plan, firstly ask me to review it. Do not continue until I approve the plan.
+
+### While implementing
+
+You should update the plan as you work.
+After you complete tasks in the plan, you should update and append detailed descriptions of the changes you made, so following tasks can be easily hand over to other engineers.
+Make every task and code change you do as simple as possible. We want to avoid making any massive or complex changes. Every change should impact as little code as possible. Everything is about simplicity.
+
+NOTICE:
+
+- DO NOT BE LAZY. NEVER BE LAZY. IF THERE IS A BUG FIND THE ROOT CAUSE AND FIX IT. NO TEMPORARY FIXES. YOU ARE A SENIOR DEVELOPER. NEVER BE LAZY
+- MAKE ALL FIXES AND CODE CHANGES AS SIMPLE AS HUMANLY POSSIBLE. THEY SHOULD ONLY IMPACT NECESSARY CODE RELEVANT TO THE TASK AND NOTHING ELSE. IT SHOULD IMPACT AS LITTLE CODE AS POSSIBLE. YOUR GOAL IS TO NOT INTRODUCE ANY BUGS. IT'S ALL ABOUT SIMPLICITY
+
 ## Development Commands
 
 ```bash
 # Install dependencies
 bun install
 
-# Development server
+# Development server (includes API mock server)
 bun dev
 
-# Build for production (static export)
+# Build for production (static export to /out)
 bun build
 
 # Lint code
@@ -20,54 +43,50 @@ bun lint
 
 ## Project Architecture
 
-This is a **static web application** built with Next.js 15 and App Router, configured for static export. The application provides 5 developer tools that run entirely client-side.
+A **static web application** built with Next.js 15 and App Router, configured for static export. The app provides 8 developer tools that run entirely client-side.
 
-### Key Architecture Decisions
+### Static Export Configuration
 
-1. **Static Export Configuration**:
-   - `next.config.js` sets `output: 'export'` for static generation
-   - Base path (`/web-tools`) and asset prefix are automatically added in production
-   - Build outputs to `/out` directory with `.nojekyll` file for GitHub Pages
+- `next.config.js` sets `output: 'export'` for static generation
+- Base path `/web-tools` and asset prefix applied in production
+- Build outputs to `/out` directory with `.nojekyll` file for GitHub Pages
+- Images are unoptimized (static export limitation)
 
-2. **Client-Side Processing**:
-   - All tool pages use `'use client'` directive
-   - No API routes or server-side processing
-   - All data processing happens in the browser for privacy
+### Tool Structure Pattern
 
-3. **Tool Structure Pattern**:
-   Each tool follows the same pattern:
-   - Independent page in `/app/[tool]/page.tsx`
-   - Local state management with useState
-   - History tracking via localStorage (key: `[tool]_history`)
-   - Shared UI components (Layout, Header)
-   - Tool-specific CSS in `tools.css`
+Each tool follows this pattern:
+- Independent route: `/app/[tool]/page.tsx`
+- Local state with `useState`
+- History tracking via `useHistory` hook (key: `[tool]_history`)
+- Shared UI components from `app/components/shared/`
+- Tool-specific logic in `app/utils/` and sub-components
 
-### Important Implementation Details
+### Shared Abstractions
 
-1. **History Management**:
-   - Each tool maintains its own history in localStorage
-   - History items include: type, input, output, timestamp, and mode
-   - Maximum 100 history items per tool
+- **Hooks** (`app/hooks/`): `useHistory`, `useLocalStorage`, `useCopyToClipboard`
+- **Utils** (`app/utils/`): Business logic for each tool type
+- **Components** (`app/components/shared/`): `HistoryPanel`, `CodeInput`, `CodeOutput`, `ToolLayout`
+- **Types** (`app/types/`): Centralized TypeScript interfaces
+- **Providers** (`app/providers/`): `ThemeProvider`, `ToastProvider`, `I18nProvider`
 
-2. **Theme System**:
-   - `ThemeProvider.tsx` manages dark/light mode
-   - Theme state persisted in localStorage
-   - Direct DOM manipulation for theme switching
+### Current Tools
 
-3. **Security Considerations**:
-   - JSON tool uses `new Function()` fallback for parsing (security risk)
-   - Diff tool uses `dangerouslySetInnerHTML` for HTML rendering
-   - All inputs should be sanitized when working with these areas
+1. **jwt** - JWT encode/decode
+2. **json** - JSON format/validate
+3. **image** - Image conversion
+4. **timestamp** - Timestamp conversion
+5. **diff** - Text comparison
+6. **aisql** - Natural language to SQL
+7. **jsonfix** - AI JSON fix
+8. **translate** - AI translation
 
-### Current Technical Debt
+## Important Implementation Details
 
-1. **Code Duplication**: History management, clipboard operations, and UI components are duplicated across tools
-2. **Type Safety**: Uses `any` types in several places, particularly in JSON parsing functions
-3. **Accessibility**: Missing ARIA labels and keyboard navigation
-4. **Error Handling**: Uses browser alerts instead of user-friendly error UI
+1. **History Management**: `useHistory` hook manages localStorage persistence (max 100 items)
+2. **Theme System**: `ThemeProvider` handles dark/light mode via localStorage
+3. **Security**: JSON tool uses `new Function()` fallback for parsing; Diff uses `dangerouslySetInnerHTML`
+4. **API Server**: Go-based API server in `server-go/` provides backend functionality for AI features
 
-### Deployment
+## Deployment
 
-- GitHub Pages workflow in `.github/workflows/deploy.yml`
-- Automatic deployment on push to main branch
-- Static files served from `/web-tools/` subdirectory
+GitHub Pages workflow in `.github/workflows/deploy.yml` auto-deploys on push to main. Static files served from `/web-tools/` subdirectory.

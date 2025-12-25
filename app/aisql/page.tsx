@@ -28,6 +28,7 @@ import { STORAGE_KEYS } from '@/constants'
 import './tools.css'
 
 interface DbConfig {
+  type: 'mysql' | 'postgres'
   host: string
   port: number
   user: string
@@ -66,6 +67,7 @@ interface OllamaModel {
 }
 
 const DEFAULT_CONFIG: DbConfig = {
+  type: 'mysql',
   host: 'localhost',
   port: 3306,
   user: 'root',
@@ -136,24 +138,34 @@ export default function AiSqlTool() {
   }, [])
 
   // Load models from Ollama
-  const loadModels = useCallback(async () => {
-    try {
-      const res = await fetch(`${API_BASE}/ollama/models`)
-      const data = await res.json()
-      if (data.success && data.models) {
-        setModels(data.models)
-        if (data.models.length > 0 && !data.models.find((m: OllamaModel) => m.name === selectedModel)) {
-          setSelectedModel(data.models[0].name)
-        }
-      }
-    } catch {
-      // Ollama might not be running
-    }
-  }, [selectedModel])
-
   useEffect(() => {
+    let mounted = true
+
+    const loadModels = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/ollama/models`)
+        const data = await res.json()
+        if (mounted && data.success && data.models) {
+          setModels(data.models)
+          if (data.models.length > 0) {
+            // Check if current selected model is available
+            const currentModelAvailable = data.models.some((m: OllamaModel) => m.name === selectedModel)
+            if (!currentModelAvailable && data.models.length > 0) {
+              setSelectedModel(data.models[0].name)
+            }
+          }
+        }
+      } catch {
+        // Ollama might not be running
+      }
+    }
+
     loadModels()
-  }, [loadModels])
+
+    return () => {
+      mounted = false
+    }
+  }, [])
 
   // Save config to localStorage
   const saveConfig = useCallback((newConfig: DbConfig) => {
@@ -292,7 +304,8 @@ export default function AiSqlTool() {
         body: JSON.stringify({
           prompt: naturalInput,
           schema: schema.formatted,
-          model: selectedModel
+          model: selectedModel,
+          dbType: config.type
         })
       })
       const data = await res.json()
@@ -458,6 +471,20 @@ export default function AiSqlTool() {
             <span className="config-header-title">{t.aisql.databaseConfig}</span>
           </div>
           <div className="config-grid">
+            <div className="config-field">
+              <label>数据库类型</label>
+              <select
+                value={config.type}
+                onChange={(e) => {
+                  const newType = e.target.value as 'mysql' | 'postgres'
+                  const newPort = newType === 'mysql' ? 3306 : 5432
+                  saveConfig({ ...config, type: newType, port: newPort })
+                }}
+              >
+                <option value="mysql">MySQL</option>
+                <option value="postgres">PostgreSQL</option>
+              </select>
+            </div>
             <div className="config-field">
               <label>{t.aisql.host}</label>
               <input

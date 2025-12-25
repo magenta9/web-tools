@@ -3,8 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "scripts": {
-    "dev": "node server/index.js & next dev",
-    "dev:api": "node server/index.js",
+    "dev": "next dev",
     "build": "next build && touch out/.nojekyll",
     "start": "next start",
     "lint": "next lint"
@@ -26,10 +25,5 @@
     "postcss": "^8.4.24",
     "tailwindcss": "^3.3.0",
     "typescript": "^5"
-  },
-  "optionalDependencies": {
-    "cors": "^2.8.5",
-    "dotenv": "^16.6.1",
-    "express": "^4.22.1"
   }
 }

@@ -1,86 +1,103 @@
 # Web Tools
 
-A collection of useful web tools built with Next.js and TypeScript.
+一套实用的 Web 开发工具集，基于 Next.js 和 TypeScript 构建。
 
-## Features
+## 功能特性
 
-- **JWT Tool**: Encode and decode JSON Web Tokens
-- **JSON Tool**: Format, validate, and manipulate JSON data
-- **Image Tool**: Convert and resize images
-- **Timestamp Tool**: Convert timestamps between different formats
-- **Diff Tool**: Compare text and find differences
+- **JWT Tool**: JWT 编码和解码
+- **JSON Tool**: JSON 格式化、验证和处理
+- **JSON Fix**: AI 辅助修复损坏的 JSON
+- **Image Tool**: 图片格式转换和尺寸调整
+- **Timestamp Tool**: 时间戳格式转换
+- **Diff Tool**: 文本差异对比
+- **Translate Tool**: AI 翻译工具
+- **AI SQL**: AI 辅助 SQL 生成
 
-## Tech Stack
+## 项目结构
 
+```
+web-tools/
+├── app/                    # Next.js 前端
+│   ├── jwt/               # JWT 工具
+│   ├── json/              # JSON 工具
+│   ├── jsonfix/           # JSON 修复工具
+│   ├── image/             # 图片工具
+│   ├── timestamp/         # 时间戳工具
+│   ├── diff/              # 差异对比工具
+│   ├── translate/         # 翻译工具
+│   ├── aisql/             # AI SQL 工具
+│   └── components/        # 公共组件
+├── server-go/             # Go API 服务器
+│   ├── cmd/server/        # 入口
+│   ├── internal/          # 内部模块
+│   └── docker/            # 数据库配置
+└── locales/               # 国际化
+```
+
+## 技术栈
+
+**前端:**
 - Next.js 15
 - React 19
 - TypeScript
 - Tailwind CSS
-- Font Awesome Icons
 
-## Getting Started
+**后端:**
+- Go 1.23+
+- Gin Web 框架
+- PostgreSQL (历史记录)
+- Ollama (AI 功能)
 
-First, install the dependencies:
+## 快速开始
+
+### 前端
 
 ```bash
+# 安装依赖
 bun install
-```
 
-Then, run the development server:
-
-```bash
+# 启动开发服务器
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+访问 [http://localhost:3000](http://localhost:3000)
 
-## Build for Production
-
-To build the project for production:
+### 后端 (可选，用于 AI 功能)
 
 ```bash
-bun build
+cd server-go
+
+# 启动数据库
+make db-up
+
+# 启动 API 服务器
+make run
 ```
 
-The static files will be generated in the `out` directory, ready for deployment.
+API 服务运行在 [http://localhost:3001](http://localhost:3001)
 
-## Available Scripts
+## 可用脚本
 
-- `bun dev` - Start the development server
-- `bun run build` - Build for production (creates .nojekyll for GitHub Pages)
-- `bun run build:analyze` - Build with bundle analyzer
-- `bun run start` - Start production server
-- `bun run lint` - Run ESLint
-- `bun run lint:fix` - Fix ESLint issues automatically
-- `bun run format` - Format code with Prettier
-- `bun run format:check` - Check code formatting
-- `bun run type-check` - Run TypeScript type checking without emitting files
+| 命令 | 说明 |
+|------|------|
+| `bun dev` | 启动前端开发服务器 |
+| `bun run build` | 构建生产版本 |
+| `bun run start` | 启动生产服务器 |
+| `bun run lint` | 运行 ESLint |
 
-## Code Quality
+## 部署
 
-This project uses:
-
-- **TypeScript**: Enabled with strict mode for type safety
-- **ESLint**: For linting JavaScript/TypeScript code
-- **Prettier**: For code formatting
-- **Husky**: For Git hooks
-- **lint-staged**: For running linters on staged files
-
-### Pre-commit Hooks
-
-The project automatically runs:
-- ESLint with auto-fix on staged files
-- Prettier formatting on staged files
-
-## Deployment
-
-This project is configured for static export and can be deployed to:
-
-- GitHub Pages (automatically creates .nojekyll file)
+前端支持静态导出，可部署到：
+- GitHub Pages
 - Netlify
 - Vercel
-- Any static hosting service
+- 任何静态托管服务
+
+```bash
+bun run build
+# 静态文件生成在 out/ 目录
+```
 
 ## License
 
-MIT License
+MIT
