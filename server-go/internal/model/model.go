@@ -15,3 +15,13 @@ type Config struct {
 	Value     any       `json:"value"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
+
+type Prompt struct {
+	ID        int64     `json:"id"`
+	Title     string    `json:"title"`
+	Content   string    `json:"content"`
+	Tags      []string  `json:"tags"`
+	UseCount  int       `json:"use_count"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+}

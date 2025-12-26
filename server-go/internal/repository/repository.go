@@ -131,3 +131,103 @@ func (r *Repository) ClearHistory(ctx context.Context, toolName string) error {
 	_, err := r.pool.Exec(ctx, `DELETE FROM tool_history WHERE tool_name = $1`, toolName)
 	return err
 }
+
+// Prompt methods
+func (r *Repository) CreatePrompt(ctx context.Context, p *model.Prompt) (*model.Prompt, error) {
+	var id int64
+	err := r.pool.QueryRow(ctx,
+		`INSERT INTO prompts (title, content, tags) VALUES ($1, $2, $3) RETURNING id, created_at, updated_at`,
+		p.Title, p.Content, p.Tags).Scan(&id, &p.CreatedAt, &p.UpdatedAt)
+	if err != nil {
+		return nil, err
+	}
+	p.ID = id
+	return p, nil
+}
+
+func (r *Repository) GetPrompts(ctx context.Context, search string, tags []string, limit int) ([]model.Prompt, error) {
+	if limit <= 0 {
+		limit = 100
+	}
+
+	query := `SELECT id, title, content, tags, use_count, created_at, updated_at FROM prompts WHERE 1=1`
+	args := []interface{}{}
+	argCount := 1
+
+	if search != "" {
+		query += fmt.Sprintf(` AND (title ILIKE $%d OR content ILIKE $%d)`, argCount, argCount)
+		args = append(args, "%"+search+"%")
+		argCount++
+	}
+
+	if len(tags) > 0 {
+		query += fmt.Sprintf(` AND tags && $%d`, argCount)
+		args = append(args, tags)
+		argCount++
+	}
+
+	query += ` ORDER BY created_at DESC LIMIT $` + fmt.Sprintf("%d", argCount)
+	args = append(args, limit)
+
+	rows, err := r.pool.Query(ctx, query, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var results []model.Prompt
+	for rows.Next() {
+		var p model.Prompt
+		if err := rows.Scan(&p.ID, &p.Title, &p.Content, &p.Tags, &p.UseCount, &p.CreatedAt, &p.UpdatedAt); err != nil {
+			return nil, err
+		}
+		results = append(results, p)
+	}
+	return results, nil
+}
+
+func (r *Repository) GetPrompt(ctx context.Context, id int64) (*model.Prompt, error) {
+	var p model.Prompt
+	err := r.pool.QueryRow(ctx,
+		`SELECT id, title, content, tags, use_count, created_at, updated_at FROM prompts WHERE id = $1`, id).
+		Scan(&p.ID, &p.Title, &p.Content, &p.Tags, &p.UseCount, &p.CreatedAt, &p.UpdatedAt)
+	if err != nil {
+		return nil, err
+	}
+	return &p, nil
+}
+
+func (r *Repository) UpdatePrompt(ctx context.Context, p *model.Prompt) error {
+	_, err := r.pool.Exec(ctx,
+		`UPDATE prompts SET title = $1, content = $2, tags = $3, updated_at = NOW() WHERE id = $4`,
+		p.Title, p.Content, p.Tags, p.ID)
+	return err
+}
+
+func (r *Repository) DeletePrompt(ctx context.Context, id int64) error {
+	_, err := r.pool.Exec(ctx, `DELETE FROM prompts WHERE id = $1`, id)
+	return err
+}
+
+func (r *Repository) IncrementPromptUseCount(ctx context.Context, id int64) error {
+	_, err := r.pool.Exec(ctx, `UPDATE prompts SET use_count = use_count + 1 WHERE id = $1`, id)
+	return err
+}
+
+func (r *Repository) GetAllTags(ctx context.Context) ([]string, error) {
+	rows, err := r.pool.Query(ctx, `SELECT DISTINCT unnest(tags) as tag FROM prompts ORDER BY tag`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var tags []string
+	for rows.Next() {
+		var tag string
+		if err := rows.Scan(&tag); err != nil {
+			return nil, err
+		}
+		tags = append(tags, tag)
+	}
+	return tags, nil
+}

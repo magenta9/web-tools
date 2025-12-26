@@ -129,3 +129,52 @@ export function getErrorMessage(error: unknown): string {
     }
     return 'An unknown error occurred'
 }
+
+// Prompt related types
+export interface Prompt {
+    id: number
+    title: string
+    content: string
+    tags: string[]
+    use_count: number
+    created_at: string
+    updated_at: string
+}
+
+export interface PromptFormData {
+    title: string
+    content: string
+    tags: string[]
+}
+
+export type PromptViewMode = 'list' | 'card'
+
+// Chat related types
+export interface ChatMessage {
+    id: string
+    role: 'user' | 'assistant' | 'system'
+    content: string
+    timestamp: number
+}
+
+export interface ChatSession {
+    id: string
+    title: string
+    messages: ChatMessage[]
+    created_at: number
+    updated_at: number
+}
+
+// Confirm dialog types
+export interface ConfirmDialogOptions {
+    title: string
+    message: string
+    confirmText?: string
+    cancelText?: string
+    type?: 'danger' | 'warning' | 'info'
+}
+
+export interface ConfirmDialogState extends ConfirmDialogOptions {
+    id: string
+    resolve: (result: boolean) => void
+}

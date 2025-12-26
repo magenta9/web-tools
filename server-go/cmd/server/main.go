@@ -26,8 +26,10 @@ func main() {
 	ollamaH := handler.NewOllamaHandler(cfg)
 	dbH := handler.NewDBHandler()
 	var historyH *handler.HistoryHandler
+	var promptH *handler.PromptHandler
 	if repo != nil {
 		historyH = handler.NewHistoryHandler(repo)
+		promptH = handler.NewPromptHandler(repo)
 	}
 
 	// Router
@@ -39,7 +41,6 @@ func main() {
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},
-		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
 	}))
 
@@ -80,6 +81,20 @@ func main() {
 			api.GET("/history", historyH.Get)
 			api.DELETE("/history/:id", historyH.Delete)
 			api.DELETE("/history", historyH.Clear)
+		}
+
+		// Prompts (only if DB available)
+		if promptH != nil {
+			prompts := api.Group("/prompts")
+			{
+				prompts.POST("", promptH.Create)
+				prompts.GET("", promptH.List)
+				prompts.GET("/tags", promptH.GetTags)
+				prompts.GET("/:id", promptH.Get)
+				prompts.PUT("/:id", promptH.Update)
+				prompts.DELETE("/:id", promptH.Delete)
+				prompts.POST("/:id/use", promptH.IncrementUse)
+			}
 		}
 	}
 

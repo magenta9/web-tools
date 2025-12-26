@@ -1,4 +1,6 @@
 export * from './useHistory'
-export * from './useOllamaModels'
 export * from './useClipboard'
 export * from './useLiveMode'
+export * from './useOllamaModels'
+export * from './usePrompts'
+export { useConfirm } from '@/hooks/useConfirm'

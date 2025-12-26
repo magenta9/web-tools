@@ -15,7 +15,9 @@ import {
   ChevronDown,
   Sparkles,
   Wrench,
-  Languages
+  Languages,
+  BookText,
+  MessageSquare
 } from 'lucide-react'
 import { useTheme } from '../providers/ThemeProvider'
 import { memo, useState, useRef } from 'react'
@@ -32,6 +34,8 @@ const aiTools = [
   { href: '/jsonfix', label: 'AI JSON Fix', Icon: FileJson },
   { href: '/aisql', label: 'AI SQL', Icon: Database },
   { href: '/translate', label: 'AI翻译', Icon: Languages },
+  { href: '/prompt', label: 'Prompt管理', Icon: BookText },
+  { href: '/chat', label: 'AI Chat', Icon: MessageSquare },
 ]
 
 const Header = memo(function Header() {

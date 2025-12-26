@@ -9,7 +9,9 @@ import {
   Database,
   FileJson,
   Sparkles,
-  Languages
+  Languages,
+  MessageSquare,
+  BookText
 } from 'lucide-react'
 
 const regularTools = [
@@ -63,6 +65,18 @@ const aiTools = [
     title: 'AI翻译',
     description: 'AI-powered translation between Chinese, English, and Japanese',
     icon: Languages
+  },
+  {
+    href: '/prompt',
+    title: 'Prompt 管理',
+    description: 'Manage and organize your AI prompt templates',
+    icon: BookText
+  },
+  {
+    href: '/chat',
+    title: 'AI Chat',
+    description: 'Chat with AI using your prompt templates',
+    icon: MessageSquare
   }
 ]
 

@@ -114,14 +114,52 @@ Write only the SQL query, nothing else. Do not include markdown code blocks.`, r
 
 func (h *OllamaHandler) Chat(c *gin.Context) {
 	var req struct {
-		Message string `json:"message"`
+		Message  string `json:"message"`
+		Model    string `json:"model"`
+		Messages []struct {
+			Role      string `json:"role"`
+			Content   string `json:"content"`
+			Timestamp int64  `json:"timestamp"`
+		} `json:"messages,omitempty"`
 	}
 	if err := c.ShouldBindJSON(&req); err != nil || req.Message == "" {
 		c.JSON(400, gin.H{"success": false, "error": "Message is required"})
 		return
 	}
 
-	result, err := h.generate(req.Message, "llama3.2")
+	model := req.Model
+	if model == "" {
+		// Try to get the first available model as fallback
+		model = h.getFirstAvailableModel()
+		if model == "" {
+			model = "llama3.2" // Keep as last resort
+		}
+	}
+
+	var result string
+	var err error
+
+	// Use chat history if provided
+	if len(req.Messages) > 0 {
+		// Build messages array for Ollama
+		messages := []map[string]any{}
+		for _, msg := range req.Messages {
+			messages = append(messages, map[string]any{
+				"role":    msg.Role,
+				"content": msg.Content,
+			})
+		}
+		// Append current message
+		messages = append(messages, map[string]any{
+			"role":    "user",
+			"content": req.Message,
+		})
+		result, err = h.chatWithHistory(messages, model)
+	} else {
+		// Fallback to single message for backward compatibility
+		result, err = h.generate(req.Message, model)
+	}
+
 	if err != nil {
 		c.JSON(500, gin.H{"success": false, "error": err.Error()})
 		return
@@ -216,4 +254,53 @@ func (h *OllamaHandler) generate(prompt, model string) (string, error) {
 		return response, nil
 	}
 	return "", fmt.Errorf("invalid response from Ollama")
+}
+
+func (h *OllamaHandler) chatWithHistory(messages []map[string]any, model string) (string, error) {
+	body, _ := json.Marshal(map[string]any{
+		"model":    model,
+		"messages": messages,
+		"stream":   false,
+		"options": map[string]any{
+			"temperature": 0.7,
+			"num_predict": 2000,
+		},
+	})
+
+	resp, err := http.Post(h.host+"/api/chat", "application/json", bytes.NewReader(body))
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	data, _ := io.ReadAll(resp.Body)
+	var result map[string]any
+	json.Unmarshal(data, &result)
+
+	if message, ok := result["message"].(map[string]any); ok {
+		if content, ok := message["content"].(string); ok {
+			return content, nil
+		}
+	}
+	return "", fmt.Errorf("invalid response from Ollama chat")
+}
+
+func (h *OllamaHandler) getFirstAvailableModel() string {
+	resp, err := http.Get(h.host + "/api/tags")
+	if err != nil {
+		return ""
+	}
+	defer resp.Body.Close()
+
+	var result map[string]any
+	json.NewDecoder(resp.Body).Decode(&result)
+
+	if modelList, ok := result["models"].([]any); ok && len(modelList) > 0 {
+		if mm, ok := modelList[0].(map[string]any); ok {
+			if name, ok := mm["name"].(string); ok {
+				return name
+			}
+		}
+	}
+	return ""
 }
