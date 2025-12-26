@@ -1,5 +1,8 @@
 # Web Tools
 
+> **迁移说明**: 此分支的 AI 功能已迁移到 [ai-web-tools](https://github.com/magenta9/ai-web-tools) 仓库。
+> 该分支仅作为历史参考保留，AI 相关功能不再在此维护。
+
 一套实用的 Web 开发工具集，基于 Next.js 和 TypeScript 构建。
 
 ## 功能特性
