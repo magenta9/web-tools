@@ -50,31 +50,39 @@ web-tools/
 
 ## 快速开始
 
-### 前端
+### 自动化安装 (推荐)
+
+运行自动安装脚本，检查并安装所有必要依赖：
 
 ```bash
-# 安装依赖
-bun install
+./setup.sh
+```
 
-# 启动开发服务器
-bun dev
+该脚本会自动：
+- 检查 Node.js、Bun、Docker 等依赖
+- 安装缺失的依赖（如 Bun）
+- 安装前端依赖包
+- 提供设置状态摘要
+
+### 手动启动
+
+#### 一键启动前端
+
+```bash
+bun install && bun dev
 ```
 
 访问 [http://localhost:3000](http://localhost:3000)
 
-### 后端 (可选，用于 AI 功能)
+#### 一键部署后端 (可选，用于 AI 功能和历史记录)
 
 ```bash
-cd server-go
-
-# 启动数据库
-make db-up
-
-# 启动 API 服务器
-make run
+cd server-go && make up
 ```
 
 API 服务运行在 [http://localhost:3001](http://localhost:3001)
+
+> **说明**: 后端服务包含 PostgreSQL 数据库和 Go API 服务器，用于支持历史记录存储和 AI 功能。前端可独立运行，不依赖后端服务。
 
 ## 可用脚本
 
