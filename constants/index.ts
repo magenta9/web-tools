@@ -4,7 +4,7 @@
 
 // CDN URLs
 export const CDN_URLS = {
-    BASE: 'https://cdn.lokboxes.ai/',
+    BASE: 'https://cdn.hiboing.com/',
     FRENCH: 'https://cdn.flippop.fun/',
 } as const
 
@@ -34,6 +34,7 @@ export const STORAGE_KEYS = {
     IMAGE_HISTORY: 'image_history',
     JWT_HISTORY: 'jwt_history',
     TIMESTAMP_HISTORY: 'timestamp_history',
+    WORDCLOUD_HISTORY: 'wordcloud_history',
     THEME: 'theme',
     LOCALE: 'locale',
 } as const
@@ -74,7 +75,7 @@ export const JWT_DEFAULTS = {
 // Example data
 export const EXAMPLES = {
     IMAGE_KEY: 'flippop/image/item/story/1996218524934668288/202512040537/6b3b2b76167b42c6a7ecfbb480e78219.jpeg',
-    IMAGE_URL: 'https://cdn.lokboxes.ai/cdn-cgi/image/quality=75,format=webp/flippop/image/item/story/1996218524934668288/202512040537/6b3b2b76167b42c6a7ecfbb480e78219.jpeg',
+    IMAGE_URL: 'https://cdn.hiboing.com/cdn-cgi/image/quality=75,format=webp/flippop/image/item/story/1996218524934668288/202512040537/6b3b2b76167b42c6a7ecfbb480e78219.jpeg',
     JWT_HEADER: {
         alg: 'HS256',
         typ: 'JWT',

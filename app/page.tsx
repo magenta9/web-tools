@@ -6,7 +6,8 @@ import {
   GitCompare,
   Clock,
   Key,
-  Database
+  Database,
+  Cloud
 } from 'lucide-react'
 
 const tools = [
@@ -39,6 +40,12 @@ const tools = [
     title: 'JWT Tool',
     description: 'Encode and decode JWT tokens',
     icon: Key
+  },
+  {
+    href: '/wordcloud',
+    title: 'Word Cloud',
+    description: 'Generate beautiful word cloud visualizations from text',
+    icon: Cloud
   }
 ]
 

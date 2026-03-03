@@ -161,6 +161,18 @@ export const enUS: Locale = {
         welcome: 'Welcome to Web Tools',
         description: 'A comprehensive suite of developer tools to make your life easier',
     },
+    wordcloud: {
+        title: 'Word Cloud',
+        inputText: 'Input Text',
+        generate: 'Generate',
+        download: 'Download',
+        clear: 'Clear',
+        placeholder: 'Paste or type text here to generate a word cloud...',
+        generateSuccess: 'Word cloud generated',
+        generateFailed: 'Word cloud generation failed',
+        noText: 'Please enter text content',
+        minWords: 'Please enter more text content',
+    },
     accessibility: {
         closeModal: 'Close modal',
         copyToClipboard: 'Copy to clipboard',

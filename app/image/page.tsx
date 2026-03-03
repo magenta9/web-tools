@@ -112,7 +112,7 @@ export default function ImageConverter() {
       }
 
       // Remove any remaining CDN prefixes
-      key = key.replace(/^cdn\.(lokboxes|flippop)\.(ai|fun)\//, '')
+      key = key.replace(/^cdn\.(hiboing|lokboxes|flippop)\.(com|ai|fun)\//, '')
 
       if (!key.startsWith('flippop/image/')) {
         throw new Error(t.validation.invalidUrl)
