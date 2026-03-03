@@ -10,7 +10,8 @@ import {
   Key,
   Sun,
   Moon,
-  Database
+  Database,
+  Cloud
 } from 'lucide-react'
 import { useTheme } from '../providers/ThemeProvider'
 import { memo } from 'react'
@@ -21,6 +22,7 @@ const navItems = [
   { href: '/diff', label: 'Diff', Icon: GitCompare },
   { href: '/timestamp', label: 'Timestamp', Icon: Clock },
   { href: '/jwt', label: 'JWT', Icon: Key },
+  { href: '/wordcloud', label: 'WordCloud', Icon: Cloud },
 ]
 
 const Header = memo(function Header() {

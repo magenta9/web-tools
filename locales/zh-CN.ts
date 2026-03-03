@@ -159,6 +159,18 @@ export const zhCN = {
         welcome: 'Welcome to Web Tools',
         description: 'A comprehensive suite of developer tools to make your life easier',
     },
+    wordcloud: {
+        title: '词云生成器',
+        inputText: '输入文本',
+        generate: '生成词云',
+        download: '下载图片',
+        clear: '清空',
+        placeholder: '在此粘贴或输入文本，生成词云...',
+        generateSuccess: '词云生成成功',
+        generateFailed: '词云生成失败',
+        noText: '请输入文本内容',
+        minWords: '请输入更多文本内容',
+    },
     accessibility: {
         closeModal: '关闭弹窗',
         copyToClipboard: '复制到剪贴板',
