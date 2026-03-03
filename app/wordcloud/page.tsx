@@ -139,7 +139,7 @@ function generateWordCloud(
     const fontSize = Math.round(minFontSize + ratio * (maxFontSize - minFontSize))
     const color = COLORS[index % COLORS.length]
 
-    ctx.font = `600 ${fontSize}px Inter, sans-serif`
+    ctx.font = `600 ${fontSize}px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif`
     const metrics = ctx.measureText(word)
     const textWidth = metrics.width + 8
     const textHeight = fontSize * 1.2
@@ -209,7 +209,7 @@ function generateWordCloud(
 
   // Draw words
   for (const entry of placed) {
-    ctx.font = `600 ${entry.fontSize}px Inter, sans-serif`
+    ctx.font = `600 ${entry.fontSize}px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif`
     ctx.fillStyle = entry.color
     ctx.textBaseline = 'top'
     ctx.fillText(entry.text, entry.x + 4, entry.y + 2)
