@@ -61,12 +61,20 @@ export default function TimestampConverter() {
         throw new Error(t.validation.invalidTimestamp)
       }
 
-      const dateObj = new Date(num)
+      // Auto-detect: if value < 1e10 treat as seconds, otherwise milliseconds
+      const isSeconds = num < 1e10
+      const ms = isSeconds ? num * 1000 : num
+
+      const dateObj = new Date(ms)
       if (isNaN(dateObj.getTime())) {
         throw new Error(t.validation.invalidTimestamp)
       }
 
       const conversions: ConversionResult[] = [
+        {
+          label: t.timestamp.detectedUnit,
+          value: isSeconds ? t.timestamp.seconds : t.timestamp.milliseconds
+        },
         {
           label: t.timestamp.utcTime,
           value: dateObj.toUTCString()
@@ -89,7 +97,7 @@ export default function TimestampConverter() {
         },
         {
           label: t.timestamp.chinaTimezone,
-          value: new Date(num + TIMEZONE_OFFSETS.CHINA * TIME_MS.HOUR).toLocaleString('zh-CN')
+          value: new Date(ms + TIMEZONE_OFFSETS.CHINA * TIME_MS.HOUR).toLocaleString('zh-CN')
         }
       ]
 
