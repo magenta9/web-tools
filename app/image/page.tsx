@@ -431,11 +431,38 @@ export default function ImageConverter() {
 
       {/* Image Preview Modal */}
       {previewUrl && (
-        <div className="image-preview-overlay" onClick={closePreview}>
-          <div className="image-preview-modal" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="image-preview-overlay"
+          onClick={closePreview}
+        >
+          <div
+            className="image-preview-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="image-preview-title"
+            tabIndex={-1}
+            onClick={(e) => e.stopPropagation()}
+            onKeyDown={(e) => {
+              if (e.key === 'Escape') {
+                e.stopPropagation()
+                closePreview()
+              }
+            }}
+          >
             <div className="image-preview-header">
-              <span className="image-preview-title">{t.image.previewTitle}</span>
-              <button className="image-preview-close" onClick={closePreview}>
+              <span
+                id="image-preview-title"
+                className="image-preview-title"
+              >
+                {t.image.previewTitle}
+              </span>
+              <button
+                type="button"
+                className="image-preview-close"
+                onClick={closePreview}
+                aria-label={t?.common?.close ?? t.image.previewTitle}
+                autoFocus
+              >
                 <X size={18} />
               </button>
             </div>
