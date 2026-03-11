@@ -11,7 +11,10 @@ import {
   Code,
   Check,
   ArrowUp,
-  History
+  History,
+  Eye,
+  X,
+  AlertCircle
 } from 'lucide-react'
 import Layout from '../components/Layout'
 import { HistoryPanel } from '../components/HistoryPanel'
@@ -48,6 +51,8 @@ export default function ImageConverter() {
   const [urlInput, setUrlInput] = useState('')
   const [urlOutput, setUrlOutput] = useState<UrlItem[]>([])
   const [keyOutput, setKeyOutput] = useState('')
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [previewError, setPreviewError] = useState(false)
   const toast = useToastContext()
   const { t } = useI18n()
   const {
@@ -182,12 +187,18 @@ export default function ImageConverter() {
     hideHistory()
   }
 
-  const handleUrlClick = (url: string, event: React.MouseEvent) => {
-    if (event.ctrlKey || event.metaKey) {
-      window.open(url, '_blank', 'noopener,noreferrer')
-    } else {
-      handleCopy(url)
-    }
+  const handleUrlClick = (url: string) => {
+    handleCopy(url)
+  }
+
+  const openPreview = (url: string) => {
+    setPreviewError(false)
+    setPreviewUrl(url)
+  }
+
+  const closePreview = () => {
+    setPreviewUrl(null)
+    setPreviewError(false)
   }
 
   const getIconComponent = (iconName: string) => {
@@ -282,17 +293,23 @@ export default function ImageConverter() {
                                 </div>
                                 <div
                                   className="url-item-content"
-                                  onClick={(e) => handleUrlClick(item.url, e)}
-                                  title="点击复制，Ctrl+点击打开链接"
+                                  onClick={() => handleUrlClick(item.url)}
+                                  title={t.image.clickToCopy}
                                 >
                                   {item.url}
                                 </div>
                                 <div className="url-item-actions">
                                   <button
+                                    className="panel-btn"
+                                    onClick={() => openPreview(item.url)}
+                                  >
+                                    <Eye size={14} /> {t.image.preview}
+                                  </button>
+                                  <button
                                     className="cyber-btn-small"
                                     onClick={() => handleCopy(item.url)}
                                   >
-                                    <Copy size={14} /> 复制
+                                    <Copy size={14} /> {t.common.copy}
                                   </button>
                                 </div>
                               </div>
@@ -411,6 +428,69 @@ export default function ImageConverter() {
           renderItemPreview={(item) => item.input.length > 200 ? item.input.substring(0, 200) + '...' : item.input}
         />
       </div>
+
+      {/* Image Preview Modal */}
+      {previewUrl && (
+        <div
+          className="image-preview-overlay"
+          onClick={closePreview}
+        >
+          <div
+            className="image-preview-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="image-preview-title"
+            tabIndex={-1}
+            onClick={(e) => e.stopPropagation()}
+            onKeyDown={(e) => {
+              if (e.key === 'Escape') {
+                e.stopPropagation()
+                closePreview()
+              }
+            }}
+          >
+            <div className="image-preview-header">
+              <span
+                id="image-preview-title"
+                className="image-preview-title"
+              >
+                {t.image.previewTitle}
+              </span>
+              <button
+                type="button"
+                className="image-preview-close"
+                onClick={closePreview}
+                aria-label={t?.common?.close ?? t.image.previewTitle}
+                autoFocus
+              >
+                <X size={18} />
+              </button>
+            </div>
+            <div className="image-preview-body">
+              {previewError ? (
+                <div className="image-preview-error">
+                  <AlertCircle size={32} />
+                  <p>{t.image.previewError}</p>
+                </div>
+              ) : (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={previewUrl}
+                  alt={t.image.previewTitle}
+                  className="image-preview-img"
+                  onError={() => setPreviewError(true)}
+                />
+              )}
+            </div>
+            <div className="image-preview-footer">
+              <span className="image-preview-url">{previewUrl}</span>
+              <button className="panel-btn" onClick={() => handleCopy(previewUrl)}>
+                <Copy size={14} /> {t.image.copyLink}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </Layout>
   )
 }

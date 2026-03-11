@@ -32,6 +32,7 @@ export default function TimestampConverter() {
   const [timestamp, setTimestamp] = useState('')
   const [date, setDate] = useState('')
   const [results, setResults] = useState<ConversionResult[]>([])
+  const [lastConversionType, setLastConversionType] = useState<'timestamp_to_date' | 'date_to_timestamp' | null>(null)
   const toast = useToastContext()
   const { t } = useI18n()
   const {
@@ -61,12 +62,20 @@ export default function TimestampConverter() {
         throw new Error(t.validation.invalidTimestamp)
       }
 
-      const dateObj = new Date(num)
+      // Auto-detect: if value < 1e10 treat as seconds, otherwise milliseconds
+      const isSeconds = num < 1e10
+      const ms = isSeconds ? num * 1000 : num
+
+      const dateObj = new Date(ms)
       if (isNaN(dateObj.getTime())) {
         throw new Error(t.validation.invalidTimestamp)
       }
 
       const conversions: ConversionResult[] = [
+        {
+          label: t.timestamp.detectedUnit,
+          value: isSeconds ? t.timestamp.seconds : t.timestamp.milliseconds
+        },
         {
           label: t.timestamp.utcTime,
           value: dateObj.toUTCString()
@@ -89,11 +98,12 @@ export default function TimestampConverter() {
         },
         {
           label: t.timestamp.chinaTimezone,
-          value: new Date(num + TIMEZONE_OFFSETS.CHINA * TIME_MS.HOUR).toLocaleString('zh-CN')
+          value: new Date(ms + TIMEZONE_OFFSETS.CHINA * TIME_MS.HOUR).toLocaleString('zh-CN')
         }
       ]
 
       setResults(conversions)
+      setLastConversionType('timestamp_to_date')
       const output = conversions.map(c => `${c.label}: ${c.value}`).join('\n')
       addToHistory('timestamp_to_date', ts, output)
       toast.success(t.toast.operationSuccess)
@@ -127,6 +137,7 @@ export default function TimestampConverter() {
       ]
 
       setResults(conversions)
+      setLastConversionType('date_to_timestamp')
       const output = conversions.map(c => `${c.label}: ${c.value}`).join('\n')
       addToHistory('date_to_timestamp', dateStr, output)
       toast.success(t.toast.operationSuccess)
@@ -172,17 +183,25 @@ export default function TimestampConverter() {
     setTimestamp('')
     setDate('')
     setResults([])
+    setLastConversionType(null)
   }
 
   const swapInputOutput = () => {
-    if (results.length > 0) {
-      const firstResult = results[0].value
-      if (results[0].label.includes('时间戳')) {
-        setTimestamp(firstResult.toString())
-        setDate('')
-      } else {
-        setDate(firstResult.toString())
+    if (results.length === 0 || !lastConversionType) return
+
+    if (lastConversionType === 'timestamp_to_date') {
+      // Use the ISO 8601 value (index 3) as the new date input
+      const isoResult = results.find(r => r.label === t.timestamp.iso8601)
+      if (isoResult) {
+        setDate(isoResult.value.toString())
         setTimestamp('')
+      }
+    } else {
+      // Use the Unix seconds value (index 0) as the new timestamp input
+      const secResult = results.find(r => r.label === t.timestamp.unixSeconds)
+      if (secResult) {
+        setTimestamp(secResult.value.toString())
+        setDate('')
       }
     }
   }
