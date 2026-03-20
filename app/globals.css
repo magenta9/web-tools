@@ -144,7 +144,9 @@ select:focus {
 
 .main-content {
   flex: 1;
-  padding: 32px 0;
+  padding: 16px 0;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Header */
@@ -166,7 +168,7 @@ select:focus {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 0;
+  padding: 10px 0;
   gap: 24px;
   flex-wrap: wrap;
 }
@@ -188,7 +190,7 @@ select:focus {
 }
 
 .logo-title {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 700;
   margin: 0;
   letter-spacing: -0.02em;
@@ -196,7 +198,7 @@ select:focus {
 }
 
 .logo-subtitle {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--text-muted);
   margin: 0;
   font-weight: 500;
@@ -254,22 +256,22 @@ select:focus {
 /* Hero Section */
 .hero {
   text-align: center;
-  padding: 72px 24px 48px;
+  padding: 40px 24px 28px;
   max-width: 680px;
   margin: 0 auto;
 }
 
 .hero h1 {
-  font-size: 2.75rem;
+  font-size: 2.5rem;
   font-weight: 700;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   letter-spacing: -0.04em;
   color: var(--text-primary);
   line-height: 1.15;
 }
 
 .hero p {
-  font-size: 1.125rem;
+  font-size: 1.05rem;
   color: var(--text-secondary);
   line-height: 1.7;
   font-weight: 400;
@@ -280,13 +282,13 @@ select:focus {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 16px;
-  padding: 0 24px 48px;
+  padding: 0 24px 32px;
 }
 
 .tool-card {
   background: var(--card-bg);
   border: 1px solid var(--border-color);
-  padding: 28px;
+  padding: 24px;
   text-decoration: none;
   color: var(--text-primary);
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
