@@ -65,10 +65,13 @@ function deepDiff(oldVal: JsonValue, newVal: JsonValue, path: string): DiffLine[
 
   // Leaf values (primitives or type mismatch)
   if (JSON.stringify(oldVal) !== JSON.stringify(newVal)) {
+    const normalizedPath = path === '' ? '(root)' : path
+    const displayKey = path === '' ? '(root)' : (path.split('.').pop() || path)
+
     diff.push({
       type: 'modified',
-      path,
-      key: path.split('.').pop() || path,
+      path: normalizedPath,
+      key: displayKey,
       oldValue: JSON.stringify(oldVal, null, 2),
       newValue: JSON.stringify(newVal, null, 2),
     })
