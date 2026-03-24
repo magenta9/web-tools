@@ -89,14 +89,23 @@ export const EXAMPLES = {
     JSON_OLD: {
         name: 'John',
         age: 30,
-        city: 'New York',
+        address: {
+            city: 'New York',
+            zip: '10001',
+        },
         hobbies: ['reading', 'swimming'],
+        scores: [90, 85, 78],
     },
     JSON_NEW: {
         name: 'John',
         age: 31,
-        city: 'Los Angeles',
+        address: {
+            city: 'Los Angeles',
+            zip: '90001',
+            state: 'CA',
+        },
         hobbies: ['reading', 'coding'],
+        scores: [90, 92, 78, 88],
         job: 'Developer',
     },
 } as const
