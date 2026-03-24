@@ -40,6 +40,7 @@ export type DiffType = 'added' | 'removed' | 'modified' | 'unchanged'
 
 export interface DiffLine {
     type: DiffType
+    path: string
     key: string
     oldValue?: string
     newValue?: string

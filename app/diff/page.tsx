@@ -18,8 +18,67 @@ import { useToastContext } from '../providers/ToastProvider'
 import { useI18n } from '../providers/I18nProvider'
 import { pasteFromClipboard, copyToClipboard } from '../utils'
 import { EXAMPLES } from '@/constants'
-import type { DiffLine, DiffStats, JsonObject } from '@/types'
+import type { DiffLine, DiffStats, JsonValue } from '@/types'
 import '../tools.css'
+
+function deepDiff(oldVal: JsonValue, newVal: JsonValue, path: string): DiffLine[] {
+  const diff: DiffLine[] = []
+
+  // Both are objects (not arrays, not null)
+  if (
+    oldVal !== null && newVal !== null &&
+    typeof oldVal === 'object' && typeof newVal === 'object' &&
+    !Array.isArray(oldVal) && !Array.isArray(newVal)
+  ) {
+    const oldObj = oldVal as Record<string, JsonValue>
+    const newObj = newVal as Record<string, JsonValue>
+    const allKeys = Array.from(new Set([...Object.keys(oldObj), ...Object.keys(newObj)]))
+
+    for (const key of allKeys) {
+      const childPath = path ? `${path}.${key}` : key
+      if (!(key in oldObj)) {
+        diff.push({ type: 'added', path: childPath, key, newValue: JSON.stringify(newObj[key], null, 2) })
+      } else if (!(key in newObj)) {
+        diff.push({ type: 'removed', path: childPath, key, oldValue: JSON.stringify(oldObj[key], null, 2) })
+      } else {
+        diff.push(...deepDiff(oldObj[key], newObj[key], childPath))
+      }
+    }
+    return diff
+  }
+
+  // Both are arrays
+  if (Array.isArray(oldVal) && Array.isArray(newVal)) {
+    const maxLen = Math.max(oldVal.length, newVal.length)
+    for (let i = 0; i < maxLen; i++) {
+      const childPath = `${path}[${i}]`
+      if (i >= oldVal.length) {
+        diff.push({ type: 'added', path: childPath, key: `[${i}]`, newValue: JSON.stringify(newVal[i], null, 2) })
+      } else if (i >= newVal.length) {
+        diff.push({ type: 'removed', path: childPath, key: `[${i}]`, oldValue: JSON.stringify(oldVal[i], null, 2) })
+      } else {
+        diff.push(...deepDiff(oldVal[i], newVal[i], childPath))
+      }
+    }
+    return diff
+  }
+
+  // Leaf values (primitives or type mismatch)
+  if (JSON.stringify(oldVal) !== JSON.stringify(newVal)) {
+    const normalizedPath = path === '' ? '(root)' : path
+    const displayKey = path === '' ? '(root)' : (path.split('.').pop() || path)
+
+    diff.push({
+      type: 'modified',
+      path: normalizedPath,
+      key: displayKey,
+      oldValue: JSON.stringify(oldVal, null, 2),
+      newValue: JSON.stringify(newVal, null, 2),
+    })
+  }
+
+  return diff
+}
 
 export default function JsonDiff() {
   const [oldJson, setOldJson] = useState('')
@@ -76,14 +135,14 @@ export default function JsonDiff() {
     }
 
     try {
-      const oldObj = JSON.parse(oldJson) as JsonObject
-      const newObj = JSON.parse(newJson) as JsonObject
+      const oldObj = JSON.parse(oldJson) as JsonValue
+      const newObj = JSON.parse(newJson) as JsonValue
 
-      const diff = generateDiff(oldObj, newObj)
-      const addedCount = countAdded(oldObj, newObj)
-      const removedCount = countRemoved(oldObj, newObj)
+      const diff = deepDiff(oldObj, newObj, '')
+      const addedCount = diff.filter(d => d.type === 'added').length
+      const removedCount = diff.filter(d => d.type === 'removed').length
 
-      setDiffOutput(diff)
+      setDiffOutput(diff.length > 0 ? diff : [{ type: 'unchanged', path: '', key: '' }])
       setStats({ added: addedCount, removed: removedCount })
       toast.success(t.diff.compareSuccess)
     } catch {
@@ -91,77 +150,13 @@ export default function JsonDiff() {
     }
   }
 
-  const generateDiff = (oldObj: JsonObject, newObj: JsonObject): DiffLine[] => {
-    const diff: DiffLine[] = []
-
-    // Find removed properties
-    const removedKeys = Object.keys(oldObj).filter(key => !(key in newObj))
-    removedKeys.forEach(key => {
-      diff.push({ type: 'removed', key, oldValue: JSON.stringify(oldObj[key]) })
-    })
-
-    // Find added properties
-    const addedKeys = Object.keys(newObj).filter(key => !(key in oldObj))
-    addedKeys.forEach(key => {
-      diff.push({ type: 'added', key, newValue: JSON.stringify(newObj[key]) })
-    })
-
-    // Find modified properties
-    const commonKeys = Object.keys(oldObj).filter(key => key in newObj)
-    commonKeys.forEach(key => {
-      if (JSON.stringify(oldObj[key]) !== JSON.stringify(newObj[key])) {
-        diff.push({
-          type: 'modified',
-          key,
-          oldValue: JSON.stringify(oldObj[key]),
-          newValue: JSON.stringify(newObj[key])
-        })
-      }
-    })
-
-    if (diff.length === 0) {
-      diff.push({ type: 'unchanged', key: '' })
-    }
-
-    return diff
-  }
-
-  const countAdded = (oldObj: JsonObject, newObj: JsonObject): number => {
-    let count = 0
-    const addedKeys = Object.keys(newObj).filter(key => !(key in oldObj))
-    count += addedKeys.length
-
-    const commonKeys = Object.keys(oldObj).filter(key => key in newObj)
-    commonKeys.forEach(key => {
-      if (JSON.stringify(oldObj[key]) !== JSON.stringify(newObj[key])) {
-        count++
-      }
-    })
-
-    return count
-  }
-
-  const countRemoved = (oldObj: JsonObject, newObj: JsonObject): number => {
-    let count = 0
-    const removedKeys = Object.keys(oldObj).filter(key => !(key in newObj))
-    count += removedKeys.length
-
-    const commonKeys = Object.keys(oldObj).filter(key => key in newObj)
-    commonKeys.forEach(key => {
-      if (JSON.stringify(oldObj[key]) !== JSON.stringify(newObj[key])) {
-        count++
-      }
-    })
-
-    return count
-  }
-
   const diffToText = (): string => {
     return diffOutput.map(line => {
       if (line.type === 'unchanged') return t.diff.identical
-      if (line.type === 'added') return `+ ${line.key}: ${line.newValue}`
-      if (line.type === 'removed') return `- ${line.key}: ${line.oldValue}`
-      return `~ ${line.key}:\n  - ${line.oldValue}\n  + ${line.newValue}`
+      const displayPath = line.path || line.key
+      if (line.type === 'added') return `+ ${displayPath}: ${line.newValue}`
+      if (line.type === 'removed') return `- ${displayPath}: ${line.oldValue}`
+      return `~ ${displayPath}:\n  - ${line.oldValue}\n  + ${line.newValue}`
     }).join('\n')
   }
 
@@ -188,6 +183,8 @@ export default function JsonDiff() {
     URL.revokeObjectURL(url)
   }
 
+  const modifiedCount = diffOutput.filter(d => d.type === 'modified').length
+
   return (
     <Layout>
       <div className="json-diff">
@@ -197,17 +194,17 @@ export default function JsonDiff() {
             <div className="panel">
               <div className="panel-header">
                 <div className="panel-title">
-                  <FileCode size={14} /> 原始 JSON
+                  <FileCode size={14} /> {t.diff.oldJson}
                 </div>
                 <div className="panel-actions">
                   <button className="panel-btn" onClick={pasteOldJSON}>
-                    <Clipboard size={14} /> 粘贴
+                    <Clipboard size={14} /> {t.common.paste}
                   </button>
                   <button className="panel-btn" onClick={loadOldExample}>
-                    <Code size={14} /> 示例
+                    <Code size={14} /> {t.common.example}
                   </button>
                   <button className="panel-btn" onClick={clearOldJSON}>
-                    <Trash size={14} /> 清空
+                    <Trash size={14} /> {t.common.clear}
                   </button>
                 </div>
               </div>
@@ -216,7 +213,7 @@ export default function JsonDiff() {
                   value={oldJson}
                   onChange={(e) => setOldJson(e.target.value)}
                   className="code-textarea"
-                  placeholder='输入原始 JSON 数据'
+                  placeholder={t.diff.oldJson}
                 />
               </div>
             </div>
@@ -225,17 +222,17 @@ export default function JsonDiff() {
             <div className="panel">
               <div className="panel-header">
                 <div className="panel-title">
-                  <FileCode size={14} /> 新的 JSON
+                  <FileCode size={14} /> {t.diff.newJson}
                 </div>
                 <div className="panel-actions">
                   <button className="panel-btn" onClick={pasteNewJSON}>
-                    <Clipboard size={14} /> 粘贴
+                    <Clipboard size={14} /> {t.common.paste}
                   </button>
                   <button className="panel-btn" onClick={loadNewExample}>
-                    <Code size={14} /> 示例
+                    <Code size={14} /> {t.common.example}
                   </button>
                   <button className="panel-btn" onClick={clearNewJSON}>
-                    <Trash size={14} /> 清空
+                    <Trash size={14} /> {t.common.clear}
                   </button>
                 </div>
               </div>
@@ -244,7 +241,7 @@ export default function JsonDiff() {
                   value={newJson}
                   onChange={(e) => setNewJson(e.target.value)}
                   className="code-textarea"
-                  placeholder='输入新的 JSON 数据'
+                  placeholder={t.diff.newJson}
                 />
               </div>
             </div>
@@ -253,7 +250,7 @@ export default function JsonDiff() {
           {/* Compare Button */}
           <div style={{ textAlign: 'center', margin: '20px 0' }}>
             <button className="cyber-btn-small" onClick={compareJSON}>
-              <GitCompare size={14} /> 对比 JSON
+              <GitCompare size={14} /> {t.diff.compare}
             </button>
           </div>
 
@@ -262,22 +259,25 @@ export default function JsonDiff() {
             <div className="panel">
               <div className="panel-header">
                 <div className="panel-title">
-                  <MinusCircle size={14} /> 对比结果
+                  <MinusCircle size={14} /> {t.diff.result}
                   <span style={{ marginLeft: '20px', fontSize: '14px' }}>
                     <span style={{ color: '#22c55e' }}>
-                      <Plus size={12} /> 新增: {stats.added}
+                      <Plus size={12} /> {t.diff.added}: {stats.added}
                     </span>
                     <span style={{ marginLeft: '10px', color: '#ef4444' }}>
-                      <Minus size={12} /> 删除: {stats.removed}
+                      <Minus size={12} /> {t.diff.removed}: {stats.removed}
+                    </span>
+                    <span style={{ marginLeft: '10px', color: '#fbbf24' }}>
+                      ~ {t.diff.modified}: {modifiedCount}
                     </span>
                   </span>
                 </div>
                 <div className="panel-actions">
                   <button className="panel-btn" onClick={copyDiff}>
-                    <Copy size={14} /> 复制
+                    <Copy size={14} /> {t.common.copy}
                   </button>
                   <button className="panel-btn" onClick={downloadDiff}>
-                    <Download size={14} /> 下载
+                    <Download size={14} /> {t.common.download}
                   </button>
                 </div>
               </div>
@@ -287,31 +287,32 @@ export default function JsonDiff() {
                     if (line.type === 'unchanged') {
                       return (
                         <div key={index} className="diff-item diff-unchanged">
-                          两个 JSON 对象完全相同
+                          {t.diff.identical}
                         </div>
                       )
                     }
                     if (line.type === 'added') {
                       return (
                         <div key={index} className="diff-item diff-added">
-                          <Plus size={12} /> {line.key}: {line.newValue}
+                          <Plus size={12} /> <span className="diff-path">{line.path}</span>: {line.newValue}
                         </div>
                       )
                     }
                     if (line.type === 'removed') {
                       return (
                         <div key={index} className="diff-item diff-removed">
-                          <Minus size={12} /> {line.key}: {line.oldValue}
+                          <Minus size={12} /> <span className="diff-path">{line.path}</span>: {line.oldValue}
                         </div>
                       )
                     }
                     return (
                       <div key={index} className="diff-item diff-modified">
+                        <div className="diff-modified-path">~ {line.path}</div>
                         <div className="diff-removed">
-                          <Minus size={12} /> {line.key}: {line.oldValue}
+                          <Minus size={12} /> {line.oldValue}
                         </div>
                         <div className="diff-added">
-                          <Plus size={12} /> {line.key}: {line.newValue}
+                          <Plus size={12} /> {line.newValue}
                         </div>
                       </div>
                     )

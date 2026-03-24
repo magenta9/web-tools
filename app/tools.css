@@ -674,6 +674,8 @@
   font-family: 'JetBrains Mono', monospace;
   font-size: 13px;
   line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 .diff-added {
@@ -691,6 +693,23 @@
 .diff-modified {
   background: rgba(251, 191, 36, 0.1);
   border-left: 3px solid #fbbf24;
+}
+
+.diff-path {
+  font-weight: 600;
+  opacity: 0.9;
+}
+
+.diff-modified-path {
+  font-weight: 600;
+  color: #fbbf24;
+  margin-bottom: 4px;
+}
+
+.diff-unchanged {
+  background: rgba(148, 163, 184, 0.1);
+  border-left: 3px solid #94a3b8;
+  color: #94a3b8;
 }
 
 /* Timestamp Tool Specific Styles */
