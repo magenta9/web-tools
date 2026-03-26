@@ -6,8 +6,7 @@ import {
   GitCompare,
   Clock,
   Key,
-  Cloud,
-  ArrowRight
+  Cloud
 } from 'lucide-react'
 
 const tools = [
