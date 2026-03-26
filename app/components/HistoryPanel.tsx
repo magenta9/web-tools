@@ -30,16 +30,16 @@ export interface HistoryPanelProps<T extends BaseHistoryItem> {
 
 const historyLabelStyle = {
   padding: '2px 8px',
-  borderRadius: '4px',
+  borderRadius: '3px',
   fontSize: '12px',
-  fontFamily: 'Orbitron, monospace',
-  background: 'rgba(0, 255, 255, 0.1)',
-  color: 'var(--accent-color)',
+  fontFamily: "'SFMono-Regular', Menlo, Consolas, monospace",
+  background: 'var(--bg-tertiary)',
+  color: 'var(--text-secondary)',
   border: '1px solid var(--border-color)'
 } as const
 
 const previewStyle = {
-  fontFamily: 'JetBrains Mono, monospace',
+  fontFamily: "'SFMono-Regular', Menlo, Consolas, monospace",
   fontSize: '12px',
   color: 'var(--text-primary)',
   background: 'var(--bg-secondary)',

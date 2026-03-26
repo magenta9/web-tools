@@ -6,8 +6,8 @@ import {
   GitCompare,
   Clock,
   Key,
-  Database,
-  Cloud
+  Cloud,
+  ArrowRight
 } from 'lucide-react'
 
 const tools = [
@@ -54,15 +54,15 @@ export default function Home() {
     <Layout>
       <div className="container">
         <div className="hero">
-          <h1>Welcome to Web Tools</h1>
-          <p>A comprehensive suite of developer tools to make your life easier</p>
+          <h1>Your everyday developer toolbox</h1>
+          <p>Simple, fast, privacy-first tools that run entirely in your browser. No data leaves your device.</p>
         </div>
 
         <div className="tools-grid">
           {tools.map((tool) => (
             <Link key={tool.href} href={tool.href} className="tool-card">
               <div className="tool-icon">
-                <tool.icon size={24} />
+                <tool.icon size={20} />
               </div>
               <h3>{tool.title}</h3>
               <p>{tool.description}</p>
