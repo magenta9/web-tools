@@ -454,7 +454,7 @@ select:focus {
 
 .btn-primary:hover {
   background: var(--accent-hover);
-  box-shadow: 0 2px 8px rgba(35, 131, 226, 0.25);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--accent-color) 25%, transparent);
 }
 
 .btn-secondary {
