@@ -28,28 +28,6 @@ export interface HistoryPanelProps<T extends BaseHistoryItem> {
     renderItemActions?: (item: T, index: number) => React.ReactNode
 }
 
-const historyLabelStyle = {
-  padding: '2px 8px',
-  borderRadius: '4px',
-  fontSize: '12px',
-  fontFamily: 'Orbitron, monospace',
-  background: 'rgba(0, 255, 255, 0.1)',
-  color: 'var(--accent-color)',
-  border: '1px solid var(--border-color)'
-} as const
-
-const previewStyle = {
-  fontFamily: 'JetBrains Mono, monospace',
-  fontSize: '12px',
-  color: 'var(--text-primary)',
-  background: 'var(--bg-secondary)',
-  padding: '8px',
-  borderRadius: '4px',
-  maxHeight: '80px',
-  overflowY: 'auto' as const,
-  wordBreak: 'break-all' as const
-}
-
 export function HistoryPanel<T extends BaseHistoryItem>({
     visible,
     title,
@@ -146,7 +124,7 @@ export function HistoryPanel<T extends BaseHistoryItem>({
                             <div key={`${item.type}-${item.timestamp}`} className="history-item">
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '10px' }}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                        <span style={historyLabelStyle}>
+                                        <span className="history-label">
                                             {renderItemLabel(item)}
                                         </span>
                                         <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
@@ -163,7 +141,7 @@ export function HistoryPanel<T extends BaseHistoryItem>({
                                 </div>
                                 <div style={{ marginBottom: '10px' }}>
                                     <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '5px' }}>输入:</div>
-                                    <div style={previewStyle}>
+                                    <div className="history-preview">
                                         {renderItemPreview(item)}
                                     </div>
                                 </div>

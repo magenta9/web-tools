@@ -6,7 +6,6 @@ import {
   GitCompare,
   Clock,
   Key,
-  Database,
   Cloud
 } from 'lucide-react'
 
@@ -15,37 +14,43 @@ const tools = [
     href: '/json',
     title: 'JSON Tool',
     description: 'Format, validate, minify, and analyze JSON data',
-    icon: Code
+    icon: Code,
+    color: 'icon-blue'
   },
   {
     href: '/image',
     title: 'Image Converter',
     description: 'Convert image keys/URLs and vice versa',
-    icon: Image
+    icon: Image,
+    color: 'icon-teal'
   },
   {
     href: '/diff',
     title: 'JSON Diff',
     description: 'Compare two JSON objects and find differences',
-    icon: GitCompare
+    icon: GitCompare,
+    color: 'icon-orange'
   },
   {
     href: '/timestamp',
     title: 'Timestamp Converter',
     description: 'Convert between timestamps and human-readable dates',
-    icon: Clock
+    icon: Clock,
+    color: 'icon-purple'
   },
   {
     href: '/jwt',
     title: 'JWT Tool',
     description: 'Encode and decode JWT tokens',
-    icon: Key
+    icon: Key,
+    color: 'icon-green'
   },
   {
     href: '/wordcloud',
     title: 'Word Cloud',
     description: 'Generate beautiful word cloud visualizations from text',
-    icon: Cloud
+    icon: Cloud,
+    color: 'icon-red'
   }
 ]
 
@@ -54,15 +59,15 @@ export default function Home() {
     <Layout>
       <div className="container">
         <div className="hero">
-          <h1>Welcome to Web Tools</h1>
-          <p>A comprehensive suite of developer tools to make your life easier</p>
+          <h1>Your everyday developer toolbox</h1>
+          <p>Simple, fast, privacy-first tools that run entirely in your browser. No data leaves your device.</p>
         </div>
 
         <div className="tools-grid">
           {tools.map((tool) => (
             <Link key={tool.href} href={tool.href} className="tool-card">
-              <div className="tool-icon">
-                <tool.icon size={24} />
+              <div className={`tool-icon ${tool.color}`}>
+                <tool.icon size={20} />
               </div>
               <h3>{tool.title}</h3>
               <p>{tool.description}</p>
