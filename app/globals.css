@@ -16,11 +16,25 @@
   --border-color: rgba(55, 53, 47, 0.09);
   --border-hover: rgba(55, 53, 47, 0.16);
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.06), 0 0 1px rgba(0, 0, 0, 0.04);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.08), 0 0 1px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.02);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.02);
   --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+
+  /* Semantic accent palette */
+  --green: #0f7b6c;
+  --green-light: rgba(15, 123, 108, 0.08);
+  --orange: #d9730d;
+  --orange-light: rgba(217, 115, 13, 0.08);
+  --purple: #6940a5;
+  --purple-light: rgba(105, 64, 165, 0.08);
+  --blue: #2383e2;
+  --blue-light: rgba(35, 131, 226, 0.08);
+  --red: #d44c47;
+  --red-light: rgba(212, 76, 71, 0.08);
+  --teal: #0b6e99;
+  --teal-light: rgba(11, 110, 153, 0.08);
 }
 
 .dark {
@@ -35,12 +49,25 @@
   --accent-hover: #6db3e0;
   --accent-light: rgba(82, 156, 202, 0.08);
   --code-bg: #202020;
-  --card-bg: #202020;
-  --border-color: rgba(255, 255, 255, 0.07);
-  --border-hover: rgba(255, 255, 255, 0.13);
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
-  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.25);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.35);
+  --card-bg: #252525;
+  --border-color: rgba(255, 255, 255, 0.06);
+  --border-hover: rgba(255, 255, 255, 0.12);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.03);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.03);
+
+  --green: #4dab9a;
+  --green-light: rgba(77, 171, 154, 0.1);
+  --orange: #e8930c;
+  --orange-light: rgba(232, 147, 12, 0.1);
+  --purple: #9a6dd7;
+  --purple-light: rgba(154, 109, 215, 0.1);
+  --blue: #529cca;
+  --blue-light: rgba(82, 156, 202, 0.1);
+  --red: #e06b6b;
+  --red-light: rgba(224, 107, 107, 0.1);
+  --teal: #4ea8c8;
+  --teal-light: rgba(78, 168, 200, 0.1);
 }
 
 * {
@@ -155,11 +182,13 @@ select:focus {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: var(--bg-primary);
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
 }
 
 .dark .header {
-  background: var(--bg-primary);
+  background: rgba(25, 25, 25, 0.8);
 }
 
 .header-content {
@@ -167,7 +196,7 @@ select:focus {
   align-items: center;
   justify-content: space-between;
   padding: 0;
-  height: 45px;
+  height: 48px;
   gap: 24px;
 }
 
@@ -205,7 +234,7 @@ select:focus {
 .nav {
   display: flex;
   align-items: center;
-  gap: 0;
+  gap: 1px;
   flex-wrap: wrap;
   background: transparent;
   padding: 0;
@@ -214,7 +243,7 @@ select:focus {
 }
 
 .nav-link {
-  padding: 6px 10px;
+  padding: 6px 12px;
   background: transparent;
   color: var(--text-secondary);
   text-decoration: none;
@@ -222,10 +251,11 @@ select:focus {
   font-weight: 400;
   display: flex;
   align-items: center;
-  gap: 5px;
-  transition: background 0.15s ease, color 0.15s ease;
+  gap: 6px;
+  transition: background 0.2s ease, color 0.2s ease;
   border-radius: var(--radius-sm);
   white-space: nowrap;
+  position: relative;
 }
 
 .nav-link:hover {
@@ -238,6 +268,18 @@ select:focus {
   background: var(--accent-light);
   font-weight: 500;
   box-shadow: none;
+}
+
+.nav-link.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 16px;
+  height: 2px;
+  background: var(--accent-color);
+  border-radius: 1px;
 }
 
 .theme-toggle {
@@ -255,33 +297,44 @@ select:focus {
 /* Hero Section */
 .hero {
   text-align: center;
-  padding: 64px 24px 48px;
-  max-width: 640px;
+  padding: 72px 24px 52px;
+  max-width: 660px;
   margin: 0 auto;
 }
 
 .hero h1 {
-  font-size: 2.5rem;
+  font-size: 2.75rem;
   font-weight: 700;
-  margin-bottom: 16px;
-  letter-spacing: -0.03em;
-  color: var(--text-primary);
-  line-height: 1.2;
+  margin-bottom: 18px;
+  letter-spacing: -0.035em;
+  line-height: 1.15;
+  background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.dark .hero h1 {
+  background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.5) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
 }
 
 .hero p {
-  font-size: 1.1rem;
+  font-size: 1.125rem;
   color: var(--text-secondary);
-  line-height: 1.6;
+  line-height: 1.65;
   font-weight: 400;
+  max-width: 480px;
+  margin: 0 auto;
 }
 
 /* Tools Grid */
 .tools-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 12px;
-  padding: 0 24px 48px;
+  gap: 16px;
+  padding: 0 24px 64px;
   max-width: 960px;
   margin: 0 auto;
 }
@@ -289,36 +342,73 @@ select:focus {
 .tool-card {
   background: var(--card-bg);
   border: 1px solid var(--border-color);
-  padding: 24px;
+  padding: 28px 24px;
   text-decoration: none;
   color: var(--text-primary);
-  transition: background 0.15s ease, box-shadow 0.15s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
   border-radius: var(--radius-md);
   display: block;
 }
 
 .tool-card:hover {
-  background: var(--bg-secondary);
+  transform: translateY(-2px);
   box-shadow: var(--shadow-md);
-  transform: none;
   border-color: var(--border-hover);
+}
+
+.tool-card:active {
+  transform: translateY(0);
 }
 
 .tool-icon {
   font-size: 1.5rem;
-  color: var(--text-primary);
-  margin-bottom: 14px;
-  width: 40px;
-  height: 40px;
+  margin-bottom: 16px;
+  width: 42px;
+  height: 42px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--bg-secondary);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
+  transition: transform 0.2s ease;
+}
+
+.tool-card:hover .tool-icon {
+  transform: scale(1.05);
+}
+
+/* Per-tool icon colors */
+.tool-icon.icon-blue {
+  background: var(--blue-light);
+  color: var(--blue);
+}
+
+.tool-icon.icon-teal {
+  background: var(--teal-light);
+  color: var(--teal);
+}
+
+.tool-icon.icon-orange {
+  background: var(--orange-light);
+  color: var(--orange);
+}
+
+.tool-icon.icon-purple {
+  background: var(--purple-light);
+  color: var(--purple);
+}
+
+.tool-icon.icon-red {
+  background: var(--red-light);
+  color: var(--red);
+}
+
+.tool-icon.icon-green {
+  background: var(--green-light);
+  color: var(--green);
 }
 
 .tool-card h3 {
-  font-size: 0.975rem;
+  font-size: 1rem;
   font-weight: 600;
   margin-bottom: 6px;
   letter-spacing: -0.01em;
@@ -327,7 +417,7 @@ select:focus {
 .tool-card p {
   color: var(--text-secondary);
   font-size: 0.875rem;
-  line-height: 1.5;
+  line-height: 1.55;
 }
 
 /* Card */
@@ -353,7 +443,7 @@ select:focus {
   align-items: center;
   justify-content: center;
   gap: 6px;
-  transition: background 0.15s ease;
+  transition: all 0.2s ease;
   border-radius: var(--radius-sm);
 }
 
@@ -364,8 +454,7 @@ select:focus {
 
 .btn-primary:hover {
   background: var(--accent-hover);
-  transform: none;
-  box-shadow: none;
+  box-shadow: 0 2px 8px rgba(35, 131, 226, 0.25);
 }
 
 .btn-secondary {
@@ -383,7 +472,7 @@ select:focus {
   background: transparent;
   color: var(--text-secondary);
   padding: 6px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
 }
 
 .btn-icon:hover {
@@ -470,27 +559,27 @@ select:focus {
 }
 
 .toast-success {
-  border-left: 3px solid #22c55e;
+  border-left: 3px solid var(--green);
 }
 
 .toast-success .toast-icon {
-  color: #22c55e;
+  color: var(--green);
 }
 
 .toast-error {
-  border-left: 3px solid #ef4444;
+  border-left: 3px solid var(--red);
 }
 
 .toast-error .toast-icon {
-  color: #ef4444;
+  color: var(--red);
 }
 
 .toast-warning {
-  border-left: 3px solid #f59e0b;
+  border-left: 3px solid var(--orange);
 }
 
 .toast-warning .toast-icon {
-  color: #f59e0b;
+  color: var(--orange);
 }
 
 .toast-info {
